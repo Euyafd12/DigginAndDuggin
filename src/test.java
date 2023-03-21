@@ -9,6 +9,7 @@ public class test {
         return fib(x-1) + fib(x-2);
     }
     public static void main(String[] args) {
+
         System.out.println("chicken");
         int a=100;
         System.out.println(fib(a));
