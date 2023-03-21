@@ -24,6 +24,7 @@ public class GUI extends JPanel {
     }
 
     public void prepGUI() {
+
     }
 
     public void paintComponent(Graphics window) {
