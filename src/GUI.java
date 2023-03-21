@@ -8,9 +8,10 @@ import java.util.*;
 public class GUI extends JPanel {
 
     private Graphics2D g2d;
-
+    public  int[][] matrix;
     public GUI() {
         g2d = null;
+
     }
 
     public void display(String s) {
@@ -21,6 +22,7 @@ public class GUI extends JPanel {
         frame.setSize(224*4, 288*4);
         frame.setVisible(true);
         frame.setResizable(false);
+        frame.setLocationRelativeTo(null);
     }
 
     public void prepGUI() {
@@ -31,6 +33,17 @@ public class GUI extends JPanel {
 
         g2d = (Graphics2D) window;
         prepGUI();
+    }
+
+    public void createGround()
+    {
+        for(int r=0; r<matrix.length; r++)
+        {
+            for(int c=0; c<matrix[r].length; c++)
+            {
+                if(matrix[r][c])
+            }
+        }
     }
 
     public static void main(String[] args) {
