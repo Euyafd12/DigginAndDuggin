@@ -1,4 +1,4 @@
-# Dig Dug:
+# Diggin and Duggin:
 
   * Create moveable sprite.
   * Create black trail following boundaries of Doug (Over white background)
@@ -8,3 +8,11 @@
   * Game scoreboard/Overlay
   * Let Doug fight enemies
   * Rocks?
+  
+# Classes:
+  
+   * GUI
+   * Player
+   * Enemy
+   * Game Runner/Logic
+   * Spirtes and assests
