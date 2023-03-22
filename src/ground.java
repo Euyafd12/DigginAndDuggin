@@ -1,14 +1,11 @@
 import java.util.Arrays;
 
-public class ground extends GUI{
+public class ground extends GUI {
 
-
-    public ground()
-    {
-        matrix = new int[200][224];
-        for(int r=0; r<200; r++)
-        {
-            Arrays.fill(matrix[r], 1);
+    public ground() {
+        matrix = new int[width][groundHeight];
+        for (int[] ints : matrix) {
+            Arrays.fill(ints, 1);
         }
     }
 }
