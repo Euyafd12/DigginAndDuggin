@@ -8,6 +8,8 @@
   * Game scoreboard/Overlay
   * Let Doug fight enemies
   * Rocks?
+  * Make enemies chase Doug wihout breaking blocks (idk how we're going to do this)
+  
   
 # Classes:
   
