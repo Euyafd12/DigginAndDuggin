@@ -12,10 +12,12 @@ public class GUI extends JPanel implements KeyListener {
 
     private Graphics2D g2d;
     public int[][] matrix;
-    public int xPos, yPos;
+    public int xPos, yPos, score, highScore;
     public final int width, height, groundHeight, velocity;
     private final ArrayList<Point> path;
     private Image imgBackground, imgDigDug, imgICN, imgLogo;
+
+
 
 
     public GUI() {
@@ -27,6 +29,8 @@ public class GUI extends JPanel implements KeyListener {
         groundHeight = 700;
         xPos = 0;
         yPos = 0;
+        score=0;
+        highScore=100000;
 
         path = new ArrayList<>();
 
@@ -67,6 +71,11 @@ public class GUI extends JPanel implements KeyListener {
         g2d.drawImage(imgBackground, 180, 300, 181, groundHeight, null);
         g2d.drawImage(imgBackground, 360, 300, 181, groundHeight, null);
         g2d.drawImage(imgBackground, 470, 300, 181, groundHeight, null);
+        g2d.setColor(Color.WHITE);
+        g2d.drawString("High Score", 750, 385);
+        g2d.drawString(String.valueOf(highScore), 750, 400);
+        g2d.drawString("Score", 750, 340);
+        g2d.drawString(String.valueOf(score), 750, 355);
 
         g2d.fillRect(xPos, yPos, 40, 40);
 
