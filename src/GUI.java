@@ -8,14 +8,11 @@ import java.util.*;
 public class GUI extends JPanel implements KeyListener {
 
     private Graphics2D g2d;
-    public int[][] matrix;
+
     public int xPos, yPos, score, highScore;
     public final int width, height, groundHeight, velocity;
     private final ArrayList<Point> path;
     private Image imgBackground, imgDigDug, imgICN, imgLogo;
-
-
-
 
     public GUI() {
 
@@ -26,8 +23,8 @@ public class GUI extends JPanel implements KeyListener {
         groundHeight = 700;
         xPos = 0;
         yPos = 0;
-        score=0;
-        highScore=100000;
+        score = 0;
+        highScore = 100000;
 
         path = new ArrayList<>();
 
@@ -71,6 +68,7 @@ public class GUI extends JPanel implements KeyListener {
         g2d.drawImage(imgBackground, 180, 300, 181, groundHeight, null);
         g2d.drawImage(imgBackground, 360, 300, 181, groundHeight, null);
         g2d.drawImage(imgBackground, 470, 300, 181, groundHeight, null);
+
         g2d.setColor(Color.WHITE);
         g2d.drawString("High Score", 750, 385);
         g2d.drawString(String.valueOf(highScore), 750, 400);
@@ -78,6 +76,7 @@ public class GUI extends JPanel implements KeyListener {
         g2d.drawString(String.valueOf(score), 750, 355);
 
         //Make Single black square on top of Doug
+        g2d.setColor(Color.BLACK);
         g2d.fillRect(xPos, yPos, 40, 40);
 
         //Make him move and black path follows
@@ -110,6 +109,7 @@ public class GUI extends JPanel implements KeyListener {
         int key = e.getKeyCode();
 
         if (key == KeyEvent.VK_UP) {
+
             yPos -= velocity;
 
             if (imgDigDug.equals(dL) || imgDigDug.equals(L) || imgDigDug.equals(uL)) {
@@ -120,6 +120,7 @@ public class GUI extends JPanel implements KeyListener {
             }
         }
         else if (key == KeyEvent.VK_DOWN) {
+
             yPos += velocity;
 
             if (imgDigDug.equals(dL) || imgDigDug.equals(L) || imgDigDug.equals(uL)) {
@@ -130,10 +131,12 @@ public class GUI extends JPanel implements KeyListener {
             }
         }
         else if (key == KeyEvent.VK_RIGHT) {
+
             xPos += velocity;
             imgDigDug = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/SpriteRight.png"))).getImage();
         }
         else if (key == KeyEvent.VK_LEFT) {
+
             xPos -= velocity;
             imgDigDug = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/SpriteLeft.png"))).getImage();
         }
@@ -156,9 +159,6 @@ public class GUI extends JPanel implements KeyListener {
             sound.loop(Clip.LOOP_CONTINUOUSLY);
         } catch (Exception ignore) {}
     }
-
-
-
 
     @Override
     public void keyTyped(KeyEvent e) {}

@@ -22,4 +22,5 @@ public class Player extends GUI {
         xPos = x;
         yPos = y;
     }
+
 }
