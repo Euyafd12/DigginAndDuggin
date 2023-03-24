@@ -1,12 +1,9 @@
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
+import javax.sound.sampled.*;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.util.ArrayList;
-import java.util.Objects;
+import java.awt.event.*;
+import java.util.*;
+
 
 public class GUI extends JPanel implements KeyListener {
 
@@ -30,11 +27,12 @@ public class GUI extends JPanel implements KeyListener {
 
         path = new ArrayList<>();
 
-        imgBackground = new ImageIcon(Objects.requireNonNull(getClass().getResource("background.png"))).getImage();
-        imgDigDug = new ImageIcon(Objects.requireNonNull(getClass().getResource("SpriteRight.png"))).getImage();
-        imgICN = new ImageIcon(Objects.requireNonNull(getClass().getResource("DigDugIcon.png"))).getImage();
-        imgLogo = new ImageIcon(Objects.requireNonNull(getClass().getResource("Logo.png"))).getImage();
+        imgBackground = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/background.png"))).getImage();
+        imgDigDug = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/SpriteRight.png"))).getImage();
+        imgICN = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/DigDugIcon.png"))).getImage();
+        imgLogo = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Logo.png"))).getImage();
     }
+
 
     public void display(String s) {
 
@@ -49,8 +47,7 @@ public class GUI extends JPanel implements KeyListener {
         frame.setResizable(false);
         frame.setLocationRelativeTo(null);
 
-        audio("theme.wav");
-
+        audio("Assets/theme.wav");
     }
 
     public void paintComponent(Graphics window) {
@@ -125,9 +122,9 @@ public class GUI extends JPanel implements KeyListener {
     @Override
     public void keyPressed(KeyEvent e) {
 
-        Image dL = new ImageIcon(Objects.requireNonNull(getClass().getResource("SpriteDownLeft.png"))).getImage();
-        Image L = new ImageIcon(Objects.requireNonNull(getClass().getResource("SpriteLeft.png"))).getImage();
-        Image uL = new ImageIcon(Objects.requireNonNull(getClass().getResource("SpriteUpLeft.png"))).getImage();
+        Image dL = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/SpriteDownLeft.png"))).getImage();
+        Image L = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/SpriteLeft.png"))).getImage();
+        Image uL = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/SpriteUpLeft.png"))).getImage();
 
         int key = e.getKeyCode();
 
@@ -135,29 +132,29 @@ public class GUI extends JPanel implements KeyListener {
             yPos -= velocity;
 
             if (imgDigDug.equals(dL) || imgDigDug.equals(L) || imgDigDug.equals(uL)) {
-                imgDigDug = new ImageIcon(Objects.requireNonNull(getClass().getResource("SpriteUpLeft.png"))).getImage();
+                imgDigDug = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/SpriteUpLeft.png"))).getImage();
             }
             else {
-                imgDigDug = new ImageIcon(Objects.requireNonNull(getClass().getResource("SpriteUpRight.png"))).getImage();
+                imgDigDug = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/SpriteUpRight.png"))).getImage();
             }
         }
         else if (key == KeyEvent.VK_DOWN) {
             yPos += velocity;
 
             if (imgDigDug.equals(dL) || imgDigDug.equals(L) || imgDigDug.equals(uL)) {
-                imgDigDug = new ImageIcon(Objects.requireNonNull(getClass().getResource("SpriteDownLeft.png"))).getImage();
+                imgDigDug = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/SpriteDownLeft.png"))).getImage();
             }
             else {
-                imgDigDug = new ImageIcon(Objects.requireNonNull(getClass().getResource("SpriteDownRight.png"))).getImage();
+                imgDigDug = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/SpriteDownRight.png"))).getImage();
             }
         }
         else if (key == KeyEvent.VK_RIGHT) {
             xPos += velocity;
-            imgDigDug = new ImageIcon(Objects.requireNonNull(getClass().getResource("SpriteRight.png"))).getImage();
+            imgDigDug = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/SpriteRight.png"))).getImage();
         }
         else if (key == KeyEvent.VK_LEFT) {
             xPos -= velocity;
-            imgDigDug = new ImageIcon(Objects.requireNonNull(getClass().getResource("SpriteLeft.png"))).getImage();
+            imgDigDug = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/SpriteLeft.png"))).getImage();
         }
 
         if (xPos < 0) xPos = 0;
