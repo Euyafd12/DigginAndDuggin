@@ -55,18 +55,23 @@ public class GUI extends JPanel implements KeyListener {
         super.paintComponent(window);
         g2d = (Graphics2D) window;
 
+        //Make black background
         g2d.setColor(Color.BLACK);
         g2d.fillRect(0, 0, width, height);
 
+        //Dig Dug Logo
         g2d.drawImage(imgLogo, 100, -10, (int) (1072 / 1.5), (int) (478 / 1.5), null);
 
+        //Create dirt
         g2d.drawImage(imgBackground, 0, 300, 181, groundHeight, null);
         g2d.drawImage(imgBackground, 180, 300, 181, groundHeight, null);
         g2d.drawImage(imgBackground, 360, 300, 181, groundHeight, null);
         g2d.drawImage(imgBackground, 470, 300, 181, groundHeight, null);
 
+        //Make Single black square on top of Doug
         g2d.fillRect(xPos, yPos, 40, 40);
 
+        //Make him move and black path follows
         drawPath();
         moveDigDug();
     }
@@ -84,39 +89,6 @@ public class GUI extends JPanel implements KeyListener {
         for (Point p : path) {
             g2d.fillRect(p.x, p.y, 40, 40);
         }
-    }
-    public void setDigDug(int x, int y) {
-
-        xPos = x;
-        yPos = y;
-    }
-
-
-    public void createGround() {
-
-        /*Cycle through each pixel available
-
-        for (int r = 0; r < matrix.length; r++) {
-
-            for (int c = 0; c < matrix[r].length; c++) {
-
-
-                //Match layer of rock (Coloring)
-
-                if (c <= (groundHeight / 4) + (int) (Math.random() * 35)) {
-                    g2d.setColor(top);
-                } else if (c <= groundHeight / 2 + (int) (Math.random() * 20)) {
-                    g2d.setColor(middleTop);
-                } else if (c <= (groundHeight / 2 + groundHeight / 4) + (int) (Math.random() * 15)) {
-                    g2d.setColor(middleBottom);
-                } else {
-                    g2d.setColor(bottom);
-                }
-
-                g2d.drawRect(r, c + 215, 1, 1);
-            }
-        }
-        */
     }
 
     @Override
