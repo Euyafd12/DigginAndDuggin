@@ -1,34 +1,39 @@
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.ArrayList;
+import java.util.Objects;
 
 public class GUI extends JPanel implements KeyListener {
 
     private Graphics2D g2d;
     public int[][] matrix;
     public int xPos, yPos;
-    public final int width, height, groundHeight;
-    private final Image imgBackground, imgDigDug;
-    private final Color top, middleTop, middleBottom, bottom;
+    public final int width, height, groundHeight, velocity;
+    private final ArrayList<Point> path;
+    private Image imgBackground, imgDigDug, imgICN, imgLogo;
+
 
     public GUI() {
 
+        velocity = 10;
         g2d = null;
-        width = 240 * 3;
-        height = 320 * 3;
-        groundHeight = 235 * 3;
+        width = 915;
+        height = 1040;
+        groundHeight = 700;
         xPos = 0;
         yPos = 0;
 
-        imgBackground = null;  //imgBackground = new ImageIcon(getClass().getResource("DigDugSprite.png")).getImage();
-        imgDigDug = new ImageIcon(getClass().getResource("DigDugSprite1.png")).getImage();
-        //imgDigDug = new ImageIcon(getClass().getResource("DigDugSprite2.png")).getImage();
+        path = new ArrayList<>();
 
-        top = new Color(149, 148, 147, 255);
-        middleTop = new Color(183, 151, 75, 255);
-        middleBottom = new Color(253, 184, 1, 255);
-        bottom = new Color(223, 99, 0, 255);
+        imgBackground = new ImageIcon(Objects.requireNonNull(getClass().getResource("background.png"))).getImage();
+        imgDigDug = new ImageIcon(Objects.requireNonNull(getClass().getResource("SpriteRight.png"))).getImage();
+        imgICN = new ImageIcon(Objects.requireNonNull(getClass().getResource("DigDugIcon.png"))).getImage();
+        imgLogo = new ImageIcon(Objects.requireNonNull(getClass().getResource("Logo.png"))).getImage();
     }
 
     public void display(String s) {
@@ -36,29 +41,53 @@ public class GUI extends JPanel implements KeyListener {
         JFrame frame = new JFrame(s);
         frame.add(this);
         frame.addKeyListener(this);
-
+        frame.setIconImage(imgICN);
 
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(width, height);
         frame.setVisible(true);
         frame.setResizable(false);
         frame.setLocationRelativeTo(null);
-        frame.setBackground(Color.BLACK);
+
+        audio("theme.wav");
+
     }
 
     public void paintComponent(Graphics window) {
 
         super.paintComponent(window);
         g2d = (Graphics2D) window;
-        createGround();
+
+        g2d.setColor(Color.BLACK);
+        g2d.fillRect(0, 0, width, height);
+
+        g2d.drawImage(imgLogo, 100, -10, (int) (1072 / 1.5), (int) (478 / 1.5), null);
+
+        g2d.drawImage(imgBackground, 0, 300, 181, groundHeight, null);
+        g2d.drawImage(imgBackground, 180, 300, 181, groundHeight, null);
+        g2d.drawImage(imgBackground, 360, 300, 181, groundHeight, null);
+        g2d.drawImage(imgBackground, 470, 300, 181, groundHeight, null);
+
+        g2d.fillRect(xPos, yPos, 40, 40);
+
+        drawPath();
         moveDigDug();
     }
 
     public void moveDigDug() {
 
-        g2d.drawImage(imgDigDug, xPos, yPos, 107, 107, null);
+        g2d.drawImage(imgDigDug, xPos, yPos, 40, 40, null);
+        Point temp = new Point(xPos, yPos);
+        path.add(temp);
     }
+    public void drawPath() {
 
+        g2d.setColor(Color.BLACK);
+
+        for (Point p : path) {
+            g2d.fillRect(p.x, p.y, 40, 40);
+        }
+    }
     public void setDigDug(int x, int y) {
 
         xPos = x;
@@ -96,34 +125,58 @@ public class GUI extends JPanel implements KeyListener {
     @Override
     public void keyPressed(KeyEvent e) {
 
+        Image dL = new ImageIcon(Objects.requireNonNull(getClass().getResource("SpriteDownLeft.png"))).getImage();
+        Image L = new ImageIcon(Objects.requireNonNull(getClass().getResource("SpriteLeft.png"))).getImage();
+        Image uL = new ImageIcon(Objects.requireNonNull(getClass().getResource("SpriteUpLeft.png"))).getImage();
+
         int key = e.getKeyCode();
 
         if (key == KeyEvent.VK_UP) {
-            yPos -= 5;
-            System.out.println("UP");
+            yPos -= velocity;
+
+            if (imgDigDug.equals(dL) || imgDigDug.equals(L) || imgDigDug.equals(uL)) {
+                imgDigDug = new ImageIcon(Objects.requireNonNull(getClass().getResource("SpriteUpLeft.png"))).getImage();
+            }
+            else {
+                imgDigDug = new ImageIcon(Objects.requireNonNull(getClass().getResource("SpriteUpRight.png"))).getImage();
+            }
         }
         else if (key == KeyEvent.VK_DOWN) {
-            yPos += 5;
-            System.out.println("DOWN");
+            yPos += velocity;
 
+            if (imgDigDug.equals(dL) || imgDigDug.equals(L) || imgDigDug.equals(uL)) {
+                imgDigDug = new ImageIcon(Objects.requireNonNull(getClass().getResource("SpriteDownLeft.png"))).getImage();
+            }
+            else {
+                imgDigDug = new ImageIcon(Objects.requireNonNull(getClass().getResource("SpriteDownRight.png"))).getImage();
+            }
         }
         else if (key == KeyEvent.VK_RIGHT) {
-            xPos += 5;
-            System.out.println("RIGHT");
-
+            xPos += velocity;
+            imgDigDug = new ImageIcon(Objects.requireNonNull(getClass().getResource("SpriteRight.png"))).getImage();
         }
         else if (key == KeyEvent.VK_LEFT) {
-            xPos -= 5;
-            System.out.println("LEFT");
-
+            xPos -= velocity;
+            imgDigDug = new ImageIcon(Objects.requireNonNull(getClass().getResource("SpriteLeft.png"))).getImage();
         }
 
         if (xPos < 0) xPos = 0;
-        if (yPos < 0) yPos = 0;
-        if (yPos > width) yPos = 0;
-        if (xPos > height) xPos = 0;
+        if (xPos > 611) xPos = 611;
+        if (yPos < 270) yPos = 270;
+        if (yPos > height - 80) yPos = height - 80;
 
-        paintComponent(getGraphics());
+        repaint();
+    }
+
+    public void audio(String a) {
+
+        try {
+            AudioInputStream system = AudioSystem.getAudioInputStream(Objects.requireNonNull(getClass().getResource(a)));
+            Clip sound = AudioSystem.getClip();
+            sound.open(system);
+            sound.start();
+            sound.loop(Clip.LOOP_CONTINUOUSLY);
+        } catch (Exception ignore) {}
     }
 
 

@@ -1,5 +1,3 @@
-import java.awt.*;
-
 public class Player extends GUI {
 
     private int lives;
@@ -17,5 +15,11 @@ public class Player extends GUI {
     public void setLives(int lives) {
 
         this.lives = lives;
+    }
+
+    public void setDigDug(int x, int y) {
+
+        xPos = x;
+        yPos = y;
     }
 }
