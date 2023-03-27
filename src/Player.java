@@ -1,8 +1,10 @@
+import java.io.FileNotFoundException;
+
 public class Player extends GUI {
 
     private int lives;
 
-    public Player() {
+    public Player() throws FileNotFoundException {
 
         lives = 2;
     }

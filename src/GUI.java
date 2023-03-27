@@ -2,6 +2,10 @@ import javax.sound.sampled.*;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.util.*;
 
 
@@ -13,8 +17,10 @@ public class GUI extends JPanel implements KeyListener {
     public final int width, height, groundHeight, velocity;
     private final ArrayList<Point> path;
     private Image imgBackground, imgDigDug, imgICN, imgLogo;
+    private Map<String, Image> scoreMap;
+    //private PrintWriter writer;
 
-    public GUI() {
+    public GUI() throws FileNotFoundException {
 
         velocity = 10;
         g2d = null;
@@ -24,14 +30,30 @@ public class GUI extends JPanel implements KeyListener {
         xPos = 0;
         yPos = 0;
         score = 0;
-        highScore = 100000;
+        highScore = 67;
+
+        /*
+        writer = new PrintWriter("highscore.txt");
+        Scanner s = new Scanner(new File("highscore.txt"));
+        System.out.println(s.hasNext());
+        highScore = s.nextInt();
+        */
+
+
 
         path = new ArrayList<>();
+        scoreMap = new HashMap<>();
+
+        for (int i = 0; i < 10; i++) {
+            scoreMap.put(String.valueOf(i), new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Score" + i + ".png"))).getImage());
+        }
 
         imgBackground = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/background.png"))).getImage();
         imgDigDug = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/SpriteRight.png"))).getImage();
         imgICN = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/DigDugIcon.png"))).getImage();
         imgLogo = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Logo.png"))).getImage();
+
+
     }
 
 
@@ -69,20 +91,38 @@ public class GUI extends JPanel implements KeyListener {
         g2d.drawImage(imgBackground, 360, 300, 181, groundHeight, null);
         g2d.drawImage(imgBackground, 470, 300, 181, groundHeight, null);
 
-        g2d.setColor(Color.WHITE);
-        g2d.drawString("High Score", 750, 385);
-        g2d.drawString(String.valueOf(highScore), 750, 400);
-        g2d.drawString("Score", 750, 340);
-        g2d.drawString(String.valueOf(score), 750, 355);
-
         //Make Single black square on top of Doug
-        g2d.setColor(Color.BLACK);
         g2d.fillRect(xPos, yPos, 40, 40);
 
         //Make him move and black path follows
         drawPath();
         moveDigDug();
+        score++;
+        if (score > highScore) highScore = score;
+        //writer.flush();
+        //writer.append("" + highScore);
+        drawScore(score);
     }
+
+    public void drawScore(int score) {
+
+        String sc = "" + score;
+        String hc = "" + highScore;
+
+        int xTemp = 750;
+        int xxTemp = 750;
+
+        for (int i = 0; i < sc.length(); i++) {
+            g2d.drawImage(scoreMap.get(sc.substring(i, i+1)), xTemp, 385, 24, 24, null);
+            xTemp += 24;
+        }
+
+        for (int i = 0; i < hc.length(); i++) {
+            g2d.drawImage(scoreMap.get(hc.substring(i, i+1)), xxTemp, 385+48, 24, 24, null);
+            xxTemp += 24;
+        }
+    }
+
 
     public void moveDigDug() {
 
