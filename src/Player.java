@@ -1,12 +1,34 @@
-import java.io.FileNotFoundException;
+public class Player {
 
-public class Player extends GUI {
+    public int xPos, yPos, lives, velocity;
 
-    private int lives;
 
-    public Player() throws FileNotFoundException {
+    public Player() {
 
         lives = 2;
+        xPos = 285;
+        yPos = 265;
+        velocity = 5;
+    }
+
+    public void walkUp() {
+        yPos -= velocity;
+    }
+    public void walkDown() {
+        yPos += velocity;
+    }
+    public void walkLeft() {
+        xPos -= velocity;
+    }
+    public void walkRight() {
+        xPos += velocity;
+    }
+
+    public void checkBounds() {
+        if (xPos < 0) xPos = 0;
+        if (xPos > 611) xPos = 611;
+        if (yPos < 270) yPos = 270;
+        if (yPos > 960) yPos = 960;
     }
 
     public int getLives() {

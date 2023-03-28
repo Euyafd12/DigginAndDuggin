@@ -8,25 +8,25 @@ import java.util.*;
 
 public class GUI extends JPanel implements KeyListener {
 
+    private final Player player;
     private Graphics2D g2d;
-    public int xPos, yPos;
-    public final int width, height, groundHeight, velocity;
+    public final int width, height, groundHeight;
     private double highScore, score;
     private final double tempHiScore;
     private final Image imgBackground, imgICN, imgLogo, imgHiScore, imgScore;
     private Image imgDigDug;
     private final ArrayList<Point> path;
+
     private final Map<String, Image> scoreMap;
 
     public GUI() throws FileNotFoundException {
 
-        velocity = 10;
+        player = new Player();
+
         g2d = null;
         width = 915;
         height = 1040;
         groundHeight = 700;
-        xPos = 0;
-        yPos = 0;
         score = 0;
 
         highScore = new Scanner(new File("highscore.txt")).nextDouble();
@@ -51,9 +51,9 @@ public class GUI extends JPanel implements KeyListener {
     }
 
 
-    public void display(String s) {
+    public void display() {
 
-        JFrame frame = new JFrame(s);
+        JFrame frame = new JFrame("Dig Dug");
         frame.add(this);
         frame.addKeyListener(this);
         frame.setIconImage(imgICN);
@@ -105,12 +105,12 @@ public class GUI extends JPanel implements KeyListener {
         g2d.drawImage(imgBackground, 470, 300, 181, groundHeight, null);
 
         //Make Single black square on top of Doug
-        g2d.fillRect(xPos, yPos, 40, 40);
+        g2d.fillRect(player.xPos, player.yPos, 40, 40);
 
         //Scoring System
         if (score < 10000) {
 
-            if (!path.contains(new Point(xPos, yPos))) {
+            if (!path.contains(new Point(player.xPos, player.yPos))) {
                 score += 0.25;
             }
 
@@ -123,7 +123,7 @@ public class GUI extends JPanel implements KeyListener {
 
         //Make him move and black path follows
         drawPath();
-        moveDigDug();
+        drawDigDug();
 
 
     }
@@ -152,12 +152,12 @@ public class GUI extends JPanel implements KeyListener {
     }
 
 
-    public void moveDigDug() {
+    public void drawDigDug() {
 
         //Draw Dig Dug Position and Save Existing Position
-        g2d.drawImage(imgDigDug, xPos, yPos, 40, 40, null);
+        g2d.drawImage(imgDigDug, player.xPos, player.yPos, 40, 40, null);
 
-        Point temp = new Point(xPos, yPos);
+        Point temp = new Point(player.xPos, player.yPos);
         if (!path.contains(temp)) {
             path.add(temp);
         }
@@ -184,7 +184,7 @@ public class GUI extends JPanel implements KeyListener {
         //Check What Key is Pressed, and Compare What the Current Sprite Orientation to Left Facing Positions
         if (key == KeyEvent.VK_UP) {
 
-            yPos -= velocity;
+            player.walkUp();
 
             if (imgDigDug.equals(dL) || imgDigDug.equals(L) || imgDigDug.equals(uL)) {
                 imgDigDug = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/SpriteUpLeft.png"))).getImage();
@@ -193,7 +193,7 @@ public class GUI extends JPanel implements KeyListener {
             }
         } else if (key == KeyEvent.VK_DOWN) {
 
-            yPos += velocity;
+            player.walkDown();
 
             if (imgDigDug.equals(dL) || imgDigDug.equals(L) || imgDigDug.equals(uL)) {
                 imgDigDug = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/SpriteDownLeft.png"))).getImage();
@@ -202,19 +202,16 @@ public class GUI extends JPanel implements KeyListener {
             }
         } else if (key == KeyEvent.VK_RIGHT) {
 
-            xPos += velocity;
+            player.walkRight();
             imgDigDug = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/SpriteRight.png"))).getImage();
         } else if (key == KeyEvent.VK_LEFT) {
 
-            xPos -= velocity;
+            player.walkLeft();
             imgDigDug = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/SpriteLeft.png"))).getImage();
         }
 
         //Keep Dig Dug in Bounds
-        if (xPos < 0) xPos = 0;
-        if (xPos > 611) xPos = 611;
-        if (yPos < 270) yPos = 270;
-        if (yPos > height - 80) yPos = height - 80;
+        player.checkBounds();
 
         repaint();
     }
