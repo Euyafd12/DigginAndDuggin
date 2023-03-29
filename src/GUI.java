@@ -8,6 +8,7 @@ import java.util.*;
 public class GUI extends JPanel implements KeyListener {
 
     public final Player player;
+    public final Enemy enemy;
     private Graphics2D g2d;
     public final int width, height, groundHeight;
     private double highScore, score;
@@ -20,6 +21,7 @@ public class GUI extends JPanel implements KeyListener {
     public GUI() throws FileNotFoundException {
 
         player = new Player();
+        enemy = new Enemy();
 
         g2d = null;
         width = 915;
@@ -118,10 +120,14 @@ public class GUI extends JPanel implements KeyListener {
             }
         }
         drawScore(score);
+        //g2d.fillRect(enemy.getX(), enemy.getY(), 40, 40);
 
         g2d.fillRect(player.getX(), player.getY(), 40, 40);
         drawPath();
         drawDigDug();
+
+        enemy.walkTowards(player.getX(), player.getY());
+        drawEnemy();
     }
 
 
@@ -154,6 +160,12 @@ public class GUI extends JPanel implements KeyListener {
         if (!player.path.contains(temp)) {
             player.path.add(temp);
         }
+    }
+
+    public void drawEnemy() {
+        Image img = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/GogglesRight.png"))).getImage();
+
+        g2d.drawImage(img, enemy.getX(), enemy.getY(), 40, 40, null);
     }
 
     public void drawPath() {
