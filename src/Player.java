@@ -1,34 +1,53 @@
+import java.awt.*;
+import java.util.*;
+
 public class Player {
 
-    public int xPos, yPos, lives, velocity;
-
+    private int x, y, lives;
+    private final int velocity;
+    public ArrayList<Point> path;
 
     public Player() {
 
         lives = 2;
-        xPos = 285;
-        yPos = 265;
+        x = 285;
+        y = 265;
         velocity = 5;
+
+        path = new ArrayList<>();
+        path.add(new Point(x, y));
     }
 
-    public void walkUp() {
-        yPos -= velocity;
+    public int getX() {
+
+        return x;
     }
-    public void walkDown() {
-        yPos += velocity;
+
+    public int getY() {
+
+        return y;
     }
-    public void walkLeft() {
-        xPos -= velocity;
-    }
-    public void walkRight() {
-        xPos += velocity;
+
+    public void walk(int e) {
+
+        switch (e) {
+
+            case 38 -> y -= velocity;
+
+            case 40 -> y += velocity;
+
+            case 39 -> x += velocity;
+
+            case 37 -> x -= velocity;
+        }
     }
 
     public void checkBounds() {
-        if (xPos < 0) xPos = 0;
-        if (xPos > 611) xPos = 611;
-        if (yPos < 270) yPos = 270;
-        if (yPos > 960) yPos = 960;
+
+        if (x < 0) x = 0;
+        if (x > 611) x = 611;
+        if (y < 270) y = 270;
+        if (y > 960) y = 960;
     }
 
     public int getLives() {
@@ -36,15 +55,8 @@ public class Player {
         return lives;
     }
 
-    public void setLives(int lives) {
+    public void dropLives() {
 
-        this.lives = lives;
+        lives--;
     }
-
-    public void setDigDug(int x, int y) {
-
-        xPos = x;
-        yPos = y;
-    }
-
 }
