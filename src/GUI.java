@@ -14,7 +14,7 @@ public class GUI extends JPanel implements KeyListener {
     private double highScore, score;
     private final double tempHiScore;
     private final Image imgBackground, imgICN, imgLogo, imgHiScore, imgScore;
-    private Image imgDigDug;
+    private Image imgDigDug, pauseButton;
     private final Map<String, Image> scoreMap;
     private final audioPlayer audioTrack;
 
@@ -45,6 +45,7 @@ public class GUI extends JPanel implements KeyListener {
         imgLogo = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Logo.png"))).getImage();
         imgScore = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/imgScore.png"))).getImage();
         imgHiScore = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/imgHi-Score.png"))).getImage();
+        pauseButton =  new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Empty.png"))).getImage();
     }
 
 
@@ -126,8 +127,9 @@ public class GUI extends JPanel implements KeyListener {
         drawPath();
         drawDigDug();
 
-        enemy.walkTowards(player.getX(), player.getY());
-        drawEnemy();
+        drawPause();
+        pauseButton =  new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Empty.png"))).getImage();
+
     }
 
 
@@ -175,6 +177,11 @@ public class GUI extends JPanel implements KeyListener {
         }
     }
 
+    public void drawPause()
+    {
+        g2d.drawImage(pauseButton, 300, 300, 200, 200, null);
+    }
+
     @Override
     public void keyPressed(KeyEvent e) {
 
@@ -204,6 +211,9 @@ public class GUI extends JPanel implements KeyListener {
             }
             case KeyEvent.VK_RIGHT -> imgDigDug = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/SpriteRight.png"))).getImage();
             case KeyEvent.VK_LEFT -> imgDigDug = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/SpriteLeft.png"))).getImage();
+            case KeyEvent.VK_ESCAPE -> {
+                pauseButton =new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/PauseButton.png"))).getImage();
+            }
         }
 
         player.walk(k);
