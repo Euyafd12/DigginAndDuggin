@@ -1,8 +1,6 @@
 # Diggin and Duggin:
 
-  * Create moveable sprite.
-  * Create black trail following boundaries of Doug (Over white background)
-  * Create still background frame
+  * Make audio pause when not moving
   * Make randomly moving sprites (Dragon and the other guy)
   * Add hit detection to remove life
   * Game scoreboard/Overlay
@@ -16,5 +14,6 @@
    * GUI
    * Player
    * Enemy
+   * Audio thread
    * Game Runner/Logic
    * Spirtes and assests
