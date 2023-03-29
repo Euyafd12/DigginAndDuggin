@@ -1,11 +1,8 @@
-import java.io.FileNotFoundException;
-
 public class gameRunner {
 
-    public static void main(String[] args) throws FileNotFoundException {
+    public static void main(String[] args) throws Exception {
 
-        Player Doug = new Player();
-        Doug.setDigDug(285, 265);
-        Doug.display("Dig Dug");
+        GUI gui = new GUI();
+        gui.display();
     }
 }
