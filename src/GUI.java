@@ -15,6 +15,7 @@ public class GUI extends JPanel implements KeyListener {
     private final Image imgBackground, imgICN, imgLogo, imgHiScore, imgScore;
     private Image imgDigDug;
     private final Map<String, Image> scoreMap;
+    private final audioPlayer audioTrack;
 
     public GUI() throws FileNotFoundException {
 
@@ -29,6 +30,7 @@ public class GUI extends JPanel implements KeyListener {
         highScore = new Scanner(new File("highscore.txt")).nextDouble();
         tempHiScore = highScore;
 
+        audioTrack = new audioPlayer();
         scoreMap = new HashMap<>();
 
         for (int i = 0; i < 10; i++) {
@@ -72,8 +74,7 @@ public class GUI extends JPanel implements KeyListener {
                 }
             }
         });
-
-        audio();
+        audioTrack.play();
     }
 
     public void prepGUI() {
@@ -197,18 +198,15 @@ public class GUI extends JPanel implements KeyListener {
         player.checkBounds();
 
         repaint();
-    }
-
-    public void audio() {
 
         try {
-            AudioInputStream system = AudioSystem.getAudioInputStream(Objects.requireNonNull(getClass().getResource("Assets/theme.wav")));
-            Clip sound = AudioSystem.getClip();
-            sound.open(system);
-            sound.start();
-            sound.loop(Clip.LOOP_CONTINUOUSLY);
-        } catch (Exception ignore) {}
+            Thread.sleep(10);
+        } catch (InterruptedException ex) {
+            throw new RuntimeException(ex);
+        }
+
     }
+
 
     public void keyTyped(KeyEvent e) {}
     public void keyReleased(KeyEvent e) {}
