@@ -5,36 +5,50 @@ public class audioPlayer {
 
     private AudioInputStream system;
     private Clip sound;
-    private long time;
-    boolean playing;
+    private long timestamp;
+    private boolean playing;
 
     public audioPlayer() {
 
+        //idk
         try {
             system = AudioSystem.getAudioInputStream(Objects.requireNonNull(getClass().getResource("Assets/theme.wav")));
             sound = AudioSystem.getClip();
+            sound.open(system);
         } catch (Exception ignored) {}
 
-        time = 0;
         playing = false;
+        timestamp = 0;
+    }
 
+    public boolean isPlaying() {
+        return playing;
     }
 
     public void play() {
 
+        //Start audio, uses last saved timestamp to save progress
         try {
-            sound.open(system);
-            sound.setMicrosecondPosition(time);
+
+            if (sound.getMicrosecondLength() <= timestamp) {
+                timestamp = 0;
+            }
+
+            sound.setMicrosecondPosition(timestamp);
             sound.start();
             sound.loop(Clip.LOOP_CONTINUOUSLY);
             playing = true;
         } catch (Exception ignored) {}
     }
 
+    public void setPlaying(boolean playing) {
+        this.playing = playing;
+    }
+
     public void pause() {
 
-        time = sound.getMicrosecondLength();
+        //Stop audio, saves timestamp for next startup;
+        timestamp = sound.getMicrosecondPosition();
         sound.stop();
-        playing = false;
     }
 }

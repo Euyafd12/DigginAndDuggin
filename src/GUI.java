@@ -1,4 +1,3 @@
-import javax.sound.sampled.*;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -6,22 +5,24 @@ import java.io.*;
 import java.util.*;
 
 public class GUI extends JPanel implements KeyListener {
-
+    private Graphics2D g2d;
+    private int highScore, score;
+    private Image imgDigDug, pauseButton;
     public final Player player;
     public final Enemy enemy;
-    private Graphics2D g2d;
     public final int width, height, groundHeight;
-    private double highScore, score;
     private final double tempHiScore;
     private final Image imgBackground, imgICN, imgLogo, imgHiScore, imgScore;
-    private Image imgDigDug, pauseButton;
     private final Map<String, Image> scoreMap;
-    private final audioPlayer audioTrack;
+    public final audioPlayer audioTrack;
+    private Color pauseFade;
 
     public GUI() throws FileNotFoundException {
 
         player = new Player();
         enemy = new Enemy();
+
+        pauseFade = new Color(0,0, 0, 0);
 
         g2d = null;
         width = 915;
@@ -29,22 +30,23 @@ public class GUI extends JPanel implements KeyListener {
         groundHeight = 700;
         score = 0;
 
-        highScore = new Scanner(new File("highscore.txt")).nextDouble();
+        highScore = new Scanner(new File("highscore.txt")).nextInt();
         tempHiScore = highScore;
 
         audioTrack = new audioPlayer();
         scoreMap = new HashMap<>();
 
+        //Load in map of scoreboard numbers
         for (int i = 0; i < 10; i++) {
-            scoreMap.put(String.valueOf(i), new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Score" + i + ".png"))).getImage());
+            scoreMap.put(String.valueOf(i), new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Scoreboard/Score" + i + ".png"))).getImage());
         }
 
-        imgBackground = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/background.png"))).getImage();
-        imgDigDug = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/SpriteRight.png"))).getImage();
-        imgICN = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/DigDugIcon.jpg"))).getImage();
-        imgLogo = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Logo.png"))).getImage();
-        imgScore = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/imgScore.png"))).getImage();
-        imgHiScore = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/imgHi-Score.png"))).getImage();
+        imgBackground = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Background/background.png"))).getImage();
+        imgDigDug = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Characters/DougRight.png"))).getImage();
+        imgICN = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Background/DigDugIcon.jpg"))).getImage();
+        imgLogo = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Background/Logo.png"))).getImage();
+        imgScore = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Scoreboard/imgScore.png"))).getImage();
+        imgHiScore = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Scoreboard/imgHi-Score.png"))).getImage();
         pauseButton =  new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Empty.png"))).getImage();
     }
 
@@ -67,6 +69,7 @@ public class GUI extends JPanel implements KeyListener {
 
             public void windowClosing(WindowEvent e) {
 
+                //On [X} click, clear highscore.txt, write new highscore and close the file
                 if (tempHiScore != highScore) {
                     try {
                         PrintWriter pw = new PrintWriter("highscore.txt");
@@ -77,7 +80,6 @@ public class GUI extends JPanel implements KeyListener {
                 }
             }
         });
-        audioTrack.play();
     }
 
     public void prepGUI() {
@@ -85,6 +87,7 @@ public class GUI extends JPanel implements KeyListener {
         g2d.setColor(Color.BLACK);
         g2d.fillRect(0, 0, width, height);
 
+        //Draw each piece of background
         g2d.drawImage(imgLogo, 100, -10, 714, 318, null);
         g2d.drawImage(imgScore, 700, 400, 117, 21, null);
         g2d.drawImage(imgHiScore, 700, 500, 144, 48, null);
@@ -95,9 +98,10 @@ public class GUI extends JPanel implements KeyListener {
 
         int tempPos = 675;
 
+        //Draw lives icon, reduced with each death
         for (int i = 0; i < player.getLives(); i++) {
 
-            g2d.drawImage(new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/SpriteRight.png"))).getImage(), tempPos, 720, 100, 100, null);
+            g2d.drawImage(new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Characters/DougRight.png"))).getImage(), tempPos, 720, 100, 100, null);
             tempPos += 110;
         }
     }
@@ -107,36 +111,45 @@ public class GUI extends JPanel implements KeyListener {
         super.paintComponent(window);
         g2d = (Graphics2D) window;
 
+        //Display Background
         prepGUI();
 
         if (score < 10000) {
 
+            //Prevents Doug from getting points by walking over old path
             if (!player.path.contains(new Point(player.getX(), player.getY()))) {
-                score += 0.25;
+                score ++;
             }
 
-            if (score > highScore && score == (int) score) {
-
+            if (score > highScore) {
                 highScore = score;
             }
         }
         drawScore(score);
-        //g2d.fillRect(enemy.getX(), enemy.getY(), 40, 40);
 
+        //Display Doug
         g2d.fillRect(player.getX(), player.getY(), 40, 40);
         drawPath();
         drawDigDug();
 
-        drawPause();
-        pauseButton =  new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Empty.png"))).getImage();
+        //Make enemy move towards Doug and display
+        enemy.walkTowards(player.getX(), player.getY());
+        drawEnemy();
 
+        //Check for collision between Doug and enemy
+        collisionCheck();
+
+        //Use [Escape] as switch, if on - display pause menu
+        drawPause();
     }
 
 
     public void drawScore(double score) {
 
-        String sc = "" + (int) score;
-        String hc = "" + (int) highScore;
+        //Represent score as string, go through each character and display correct number image
+
+        String sc = "" + (int) (score / 4);
+        String hc = "" + (int) (highScore / 4);
 
         int xTemp = 750;
 
@@ -156,6 +169,7 @@ public class GUI extends JPanel implements KeyListener {
 
     public void drawDigDug() {
 
+        //Draw Doug, add position to existing path list
         g2d.drawImage(imgDigDug, player.getX(), player.getY(), 40, 40, null);
 
         Point temp = new Point(player.getX(), player.getY());
@@ -165,71 +179,113 @@ public class GUI extends JPanel implements KeyListener {
     }
 
     public void drawEnemy() {
-        Image img = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/GogglesRight.png"))).getImage();
+
+        //Draw enemy
+        Image img = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Characters/GogglesRight.png"))).getImage();
 
         g2d.drawImage(img, enemy.getX(), enemy.getY(), 40, 40, null);
     }
 
     public void drawPath() {
 
+        //Draw boxes to represent Doug's dug path
         for (Point p : player.path) {
             g2d.fillRect(p.x, p.y, 40, 40);
         }
     }
 
-    public void drawPause()
-    {
-        g2d.drawImage(pauseButton, 300, 300, 200, 200, null);
+    public void collisionCheck() {
+
+        //See if Doug and Enemy intersect, lose life and teleport Doug away
+        Rectangle plyr = new Rectangle(player.getX(), player.getY(), 40, 40);
+        Rectangle enmy = new Rectangle(enemy.getX(), enemy.getY(), 40, 40);
+
+        if (plyr.intersects(enmy)) {
+
+            player.dropLives();
+            player.escapeEnemy();
+            repaint();
+        }
+
     }
 
-    @Override
+    public void drawPause() {
+
+        //Draw pause menu, if [Escape] switch on, color background transparent black and draw pause button
+
+        g2d.setColor(pauseFade);
+        g2d.fillRect(0, 0, width, height);
+
+        g2d.drawImage(pauseButton, width / 2 - 400, height / 2 - 150, 398*2, 126*2, null);
+    }
+
+
     public void keyPressed(KeyEvent e) {
 
-        Image dL = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/SpriteDownLeft.png"))).getImage();
-        Image L = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/SpriteLeft.png"))).getImage();
-        Image uL = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/SpriteUpLeft.png"))).getImage();
+        //For AudioThread - Updates track when key down
+        audioTrack.setPlaying(true);
+
+        //Temporary comparison images for Doug's face movement
+        Image dL = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Characters/DougDownLeft.png"))).getImage();
+        Image L = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Characters/DougLeft.png"))).getImage();
+        Image uL = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Characters/DougUpLeft.png"))).getImage();
+
+        Image pB = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/PauseButton.png"))).getImage();
 
         int k = e.getKeyCode();
 
+        //Compare Doug's original orientation and depending on direction display next movement
         switch (k) {
 
             case KeyEvent.VK_UP -> {
 
                 if (imgDigDug.equals(dL) || imgDigDug.equals(L) || imgDigDug.equals(uL)) {
-                    imgDigDug = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/SpriteUpLeft.png"))).getImage();
+                    imgDigDug = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Characters/DougUpLeft.png"))).getImage();
                 } else {
-                    imgDigDug = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/SpriteUpRight.png"))).getImage();
+                    imgDigDug = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Characters/DougUpRight.png"))).getImage();
                 }
             }
+
             case KeyEvent.VK_DOWN -> {
 
                 if (imgDigDug.equals(dL) || imgDigDug.equals(L) || imgDigDug.equals(uL)) {
-                    imgDigDug = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/SpriteDownLeft.png"))).getImage();
+                    imgDigDug = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Characters/DougDownLeft.png"))).getImage();
                 } else {
-                    imgDigDug = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/SpriteDownRight.png"))).getImage();
+                    imgDigDug = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Characters/DougDownRight.png"))).getImage();
                 }
             }
-            case KeyEvent.VK_RIGHT -> imgDigDug = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/SpriteRight.png"))).getImage();
-            case KeyEvent.VK_LEFT -> imgDigDug = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/SpriteLeft.png"))).getImage();
+
+            case KeyEvent.VK_RIGHT -> imgDigDug = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Characters/DougRight.png"))).getImage();
+
+            case KeyEvent.VK_LEFT -> imgDigDug = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Characters/DougLeft.png"))).getImage();
+
             case KeyEvent.VK_ESCAPE -> {
-                pauseButton =new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/PauseButton.png"))).getImage();
+
+                if (!pauseButton.equals(pB)) {
+                    pauseButton = pB;
+                    pauseFade = new Color(0, 0, 0, 180);
+                } else {
+                    pauseButton = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Empty.png"))).getImage();
+                    pauseFade = new Color(0, 0, 0, 0);
+                }
             }
         }
 
+        //Move Doug with keyboard input, lock him inbounds
         player.walk(k);
         player.checkBounds();
-
-        repaint();
-
-        try {
-            Thread.sleep(10);
-        } catch (InterruptedException ex) {
-            throw new RuntimeException(ex);
-        }
-
     }
 
+    public void keyReleased(KeyEvent e) {
+
+        //For AudioThread - Updates track when key up
+
+        if (e.getKeyCode() != KeyEvent.VK_ESCAPE) {
+
+            audioTrack.setPlaying(false);
+            audioTrack.pause();
+        }
+    }
 
     public void keyTyped(KeyEvent e) {}
-    public void keyReleased(KeyEvent e) {}
 }

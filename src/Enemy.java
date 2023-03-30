@@ -1,16 +1,16 @@
 public class Enemy {
-
-    private int health;
-    private int x, y, velocity;
+    private int x, y;
+    private final int velocity;
     public Enemy() {
 
-        health = 2;
-        x = 200;
-        y = 200;
-        velocity = 4;
+        x = 125;
+        y = 625;
+        velocity = 2;
     }
 
     public void walkTowards(int xPos, int yPos) {
+
+        //Finds longest axis of travel, then moves towards Doug in correct direction
 
         if (Math.abs(x - xPos) > Math.abs(y - yPos)) {
 
@@ -18,7 +18,9 @@ public class Enemy {
                 x -= velocity;
             }
             else x += velocity;
+
         }
+
         else {
 
             if (y - yPos > 0) {
@@ -38,9 +40,5 @@ public class Enemy {
 
     public int getY() {
         return y;
-    }
-
-    public int getHealth() {
-        return health;
     }
 }
