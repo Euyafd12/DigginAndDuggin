@@ -239,6 +239,8 @@ public class GUI extends JPanel implements KeyListener {
 
             case KeyEvent.VK_UP -> {
 
+                player.setVelY(-player.getVelocity());
+
                 if (imgDigDug.equals(dL) || imgDigDug.equals(L) || imgDigDug.equals(uL)) {
                     imgDigDug = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Characters/DougUpLeft.png"))).getImage();
                 } else {
@@ -248,6 +250,8 @@ public class GUI extends JPanel implements KeyListener {
 
             case KeyEvent.VK_DOWN -> {
 
+                player.setVelY(player.getVelocity());
+
                 if (imgDigDug.equals(dL) || imgDigDug.equals(L) || imgDigDug.equals(uL)) {
                     imgDigDug = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Characters/DougDownLeft.png"))).getImage();
                 } else {
@@ -255,9 +259,15 @@ public class GUI extends JPanel implements KeyListener {
                 }
             }
 
-            case KeyEvent.VK_RIGHT -> imgDigDug = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Characters/DougRight.png"))).getImage();
+            case KeyEvent.VK_RIGHT -> {
+                player.setVelX(player.getVelocity());
+                imgDigDug = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Characters/DougRight.png"))).getImage();
+            }
 
-            case KeyEvent.VK_LEFT -> imgDigDug = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Characters/DougLeft.png"))).getImage();
+            case KeyEvent.VK_LEFT ->  {
+                player.setVelX(-player.getVelocity());
+                imgDigDug = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Characters/DougLeft.png"))).getImage();
+            }
 
             case KeyEvent.VK_ESCAPE -> {
 
@@ -272,18 +282,28 @@ public class GUI extends JPanel implements KeyListener {
         }
 
         //Move Doug with keyboard input, lock him inbounds
-        player.walk(k);
+        //player.walk(k);
         player.checkBounds();
     }
 
     public void keyReleased(KeyEvent e) {
 
+        int c = e.getKeyCode();
         //For AudioThread - Updates track when key up
 
-        if (e.getKeyCode() != KeyEvent.VK_ESCAPE) {
+        if (c != KeyEvent.VK_ESCAPE) {
 
-            audioTrack.setPlaying(false);
-            audioTrack.pause();
+            switch (c) {
+
+                case KeyEvent.VK_UP, KeyEvent.VK_DOWN -> {
+                    player.setVelY(0);
+                }
+                case KeyEvent.VK_RIGHT, KeyEvent.VK_LEFT -> {
+                    player.setVelX(0);
+                }
+            }
+            //audioTrack.setPlaying(false);
+            //audioTrack.pause();
         }
     }
 

@@ -12,6 +12,8 @@ public class framerateThread extends Thread {
         while (true) {
 
             //40 FPS
+            gui.player.tickWalk();
+            gui.player.checkBounds();
             gui.repaint();
             try {
                 Thread.sleep(25);
