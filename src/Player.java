@@ -4,8 +4,7 @@ import java.util.*;
 
 public class Player {
 
-    private int x, y, lives;
-    private final int velocity;
+    private int x, y, lives, velX, velY, velocity;
     public ArrayList<Point> path;
 
     public Player() {
@@ -13,10 +12,16 @@ public class Player {
         lives = 2;
         x = 285;
         y = 265;
-        velocity = 5;
+        velX = 0;
+        velY = 0;
+        velocity = 4;
 
         path = new ArrayList<>();
         path.add(new Point(x, y));
+    }
+
+    public int getVelocity() {
+        return velocity;
     }
 
     public int getX() {
@@ -64,6 +69,21 @@ public class Player {
         }
     }
 
+    public void tickWalk() {
+
+        x += velX;
+        y += velY;
+    }
+
+    public void setVelX(int velX) {
+        this.velX = velX;
+    }
+
+    public void setVelY(int velY) {
+        this.velY = velY;
+    }
+
+    /*
     public void walk(int e) {
 
         //Moves Doug's position depending on keyboard input
@@ -79,6 +99,8 @@ public class Player {
             case 37 -> x -= velocity;
         }
     }
+    */
+
 
     public void checkBounds() {
 
