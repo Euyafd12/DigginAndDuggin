@@ -78,5 +78,10 @@ public class Player {
 
         lives--;
     }
+
+    public int getVelX()
+    {
+        return velX;
+    }
 }
 

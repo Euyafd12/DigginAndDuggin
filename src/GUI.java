@@ -15,8 +15,16 @@ public class GUI extends JPanel implements KeyListener {
     private final Enemy enemy;
     private final int width, height, groundHeight;
     private boolean pausePlay;
-    private final Image imgBackground, imgICN, imgLogo, imgHiScore, imgScore;
+    private final Image imgBackground;
+    private final Image imgICN;
+    private final Image imgLogo;
+    private final Image imgHiScore;
+    private final Image imgScore;
+    private Image Watermelon;
+    private final Image plus300;
     private final Map<String, Image> scoreMap;
+
+    private Rectangle waterbox;
 
 
     public GUI() throws FileNotFoundException {
@@ -35,7 +43,6 @@ public class GUI extends JPanel implements KeyListener {
         score = 0;
 
         highScore = new Scanner(new File("src/Assets/Scoreboard/highscore.txt")).nextDouble();
-        System.out.println(highScore);
 
         scoreMap = new HashMap<>();
 
@@ -51,6 +58,9 @@ public class GUI extends JPanel implements KeyListener {
         imgScore = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Scoreboard/imgScore.png"))).getImage();
         imgHiScore = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Scoreboard/imgHi-Score.png"))).getImage();
         pauseButton = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Empty.png"))).getImage();
+        Watermelon = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Watermelon.png"))).getImage();
+        plus300= new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Points300.png"))).getImage();
+        waterbox = new Rectangle(500, 625, 16, 9);
     }
 
 
@@ -108,6 +118,7 @@ public class GUI extends JPanel implements KeyListener {
             g2d.drawImage(new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Characters/DougRight.png"))).getImage(), tempPos, 720, 100, 100, null);
             tempPos += 110;
         }
+        g2d.drawImage(Watermelon, 500, 625, 16, 9, null);
     }
 
     public void paintComponent(Graphics window) {
@@ -211,6 +222,10 @@ public class GUI extends JPanel implements KeyListener {
             player.escapeEnemy();
             repaint();
         }
+        if(plyr.intersects(waterbox))
+        {
+            Watermelon= new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Empty.png"))).getImage();
+        }
 
     }
 
@@ -237,7 +252,7 @@ public class GUI extends JPanel implements KeyListener {
         int k = e.getKeyCode();
 
         //Compare Doug's original orientation and depending on direction display next movement
-        switch (k) {
+      /*  switch (k) {
 
             case KeyEvent.VK_UP -> {
 
@@ -282,8 +297,56 @@ public class GUI extends JPanel implements KeyListener {
                 }
                 pausePlay = !pausePlay;
                 repaint();
-            }
+            }*/
+        player.setVelX(0);
+        player.setVelY(0);
+        if(k==KeyEvent.VK_LEFT)
+        {
+            player.setVelX(-player.getVelocity());
+            imgDigDug = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Characters/DougLeft.png"))).getImage();
         }
+        if(k==KeyEvent.VK_RIGHT)
+        {
+            player.setVelX(player.getVelocity());
+            imgDigDug = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Characters/DougRight.png"))).getImage();
+        }
+        if(player.getVelX()==0)
+        {
+            if(k==KeyEvent.VK_UP)
+            {
+                player.setVelY(-player.getVelocity());
+
+                if (imgDigDug.equals(dL) || imgDigDug.equals(L) || imgDigDug.equals(uL)) {
+                    imgDigDug = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Characters/DougUpLeft.png"))).getImage();
+                } else {
+                    imgDigDug = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Characters/DougUpRight.png"))).getImage();
+                }
+            }
+            if(k==KeyEvent.VK_DOWN)
+            {
+                player.setVelY(player.getVelocity());
+
+                if (imgDigDug.equals(dL) || imgDigDug.equals(L) || imgDigDug.equals(uL)) {
+                    imgDigDug = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Characters/DougDownLeft.png"))).getImage();
+                } else {
+                    imgDigDug = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Characters/DougDownRight.png"))).getImage();
+                }
+            }
+
+        }
+        if(k==KeyEvent.VK_ESCAPE)
+        {
+            if (!pauseButton.equals(pB)) {
+                pauseButton = pB;
+                pauseFade = new Color(0, 0, 0, 180);
+            } else {
+                pauseButton = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Empty.png"))).getImage();
+                pauseFade = new Color(0, 0, 0, 0);
+            }
+            pausePlay = !pausePlay;
+            repaint();
+        }
+
 
         //Move Doug with keyboard input, lock him inbounds
         player.checkBounds();
@@ -305,13 +368,18 @@ public class GUI extends JPanel implements KeyListener {
         }
     }
 
-    public void saveScore() {
+    public void saveScore()  {
 
-        try {
-            PrintWriter pw = new PrintWriter("Assets/Scoreboard/highscore.txt");
-            pw.append(String.valueOf(highScore));
-            pw.close();
-        } catch (Exception ignored) {}
+
+            try{
+                PrintWriter pw = new PrintWriter("src/Assets/Scoreboard/highscore.txt");
+                pw.append(String.valueOf(highScore));
+                pw.close();
+            }
+            catch(Exception ignored){
+
+            }
+
     }
 
     public void audioPlay() {
