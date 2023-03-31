@@ -1,6 +1,6 @@
 public class framerateThread extends Thread {
 
-    private GUI gui;
+    private final GUI gui;
 
     public framerateThread(GUI g) {
 
@@ -11,13 +11,17 @@ public class framerateThread extends Thread {
 
         while (true) {
 
-            //40 FPS
-            gui.player.tickWalk();
-            gui.player.checkBounds();
-            gui.repaint();
-            try {
-                Thread.sleep(25);
-            } catch (Exception ignore) {}
+            System.out.print("");
+            if (gui.isPausePlay()) {
+
+                //40 FPS
+                gui.getPlayer().tickWalk();
+                gui.getPlayer().checkBounds();
+                gui.repaint();
+                try {
+                    Thread.sleep(25);
+                } catch (Exception ignore) {}
+            }
         }
     }
 

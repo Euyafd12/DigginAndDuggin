@@ -6,19 +6,17 @@ public class gameRunner {
         GUI gui = new GUI();
         gui.display();
 
-        //Use thread to continuously check if character is moving to play theme
-        audioThread musicThread = new audioThread(gui);
-        musicThread.start();
-
         framerateThread frameThread = new framerateThread(gui);
         frameThread.start();
 
-        while(true) {
+        while (true) {
 
             //End game when lives hit 0
             System.out.print("");
-            if (gui.player.getLives() < 0) {
+            if (gui.getPlayer().getLives() < 0) {
+
                 System.out.println("Game Over!");
+                gui.saveScore();
                 System.exit(999999999);
             }
         }

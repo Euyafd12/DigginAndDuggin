@@ -1,4 +1,5 @@
 
+import javax.sound.sampled.*;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -7,23 +8,25 @@ import java.util.*;
 
 public class GUI extends JPanel implements KeyListener {
     private Graphics2D g2d;
-    private int highScore, score;
+    private double highScore, score;
     private Image imgDigDug, pauseButton;
-    public final Player player;
-    public final Enemy enemy;
-    public final int width, height, groundHeight;
-    private final double tempHiScore;
+    private Color pauseFade;
+    private final Player player;
+    private final Enemy enemy;
+    private final int width, height, groundHeight;
+    private boolean pausePlay;
     private final Image imgBackground, imgICN, imgLogo, imgHiScore, imgScore;
     private final Map<String, Image> scoreMap;
-    public final audioPlayer audioTrack;
-    private Color pauseFade;
+
 
     public GUI() throws FileNotFoundException {
 
         player = new Player();
         enemy = new Enemy();
 
-        pauseFade = new Color(0,0, 0, 0);
+        pauseFade = new Color(0, 0, 0, 0);
+
+        pausePlay = true;
 
         g2d = null;
         width = 915;
@@ -31,10 +34,9 @@ public class GUI extends JPanel implements KeyListener {
         groundHeight = 700;
         score = 0;
 
-        highScore = new Scanner(new File("highscore.txt")).nextInt();
-        tempHiScore = highScore;
+        highScore = new Scanner(new File("src/Assets/Scoreboard/highscore.txt")).nextDouble();
+        System.out.println(highScore);
 
-        audioTrack = new audioPlayer();
         scoreMap = new HashMap<>();
 
         //Load in map of scoreboard numbers
@@ -48,9 +50,8 @@ public class GUI extends JPanel implements KeyListener {
         imgLogo = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Background/Logo.png"))).getImage();
         imgScore = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Scoreboard/imgScore.png"))).getImage();
         imgHiScore = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Scoreboard/imgHi-Score.png"))).getImage();
-        pauseButton =  new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Empty.png"))).getImage();
+        pauseButton = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Empty.png"))).getImage();
     }
-
 
 
     public void display() {
@@ -71,16 +72,18 @@ public class GUI extends JPanel implements KeyListener {
             public void windowClosing(WindowEvent e) {
 
                 //On [X} click, clear highscore.txt, write new highscore and close the file
-                if (tempHiScore != highScore) {
-                    try {
-                        PrintWriter pw = new PrintWriter("highscore.txt");
-                        pw.append(String.valueOf(highScore));
-                        pw.close();
-                    } catch (Exception ignored) {
-                    }
-                }
+                saveScore();
             }
         });
+        audioPlay();
+    }
+
+    public Player getPlayer() {
+        return player;
+    }
+
+    public boolean isPausePlay() {
+        return pausePlay;
     }
 
     public void prepGUI() {
@@ -115,11 +118,12 @@ public class GUI extends JPanel implements KeyListener {
         //Display Background
         prepGUI();
 
+        //Draw Scoreboard
         if (score < 10000) {
 
             //Prevents Doug from getting points by walking over old path
             if (!player.path.contains(new Point(player.getX(), player.getY()))) {
-                score ++;
+                score += 0.25;
             }
 
             if (score > highScore) {
@@ -140,7 +144,7 @@ public class GUI extends JPanel implements KeyListener {
         //Check for collision between Doug and enemy
         collisionCheck();
 
-        //Use [Escape] as switch, if on - display pause menu
+        //Use [Escape] as switch, if on - display pause menu and freeze game
         drawPause();
     }
 
@@ -149,8 +153,8 @@ public class GUI extends JPanel implements KeyListener {
 
         //Represent score as string, go through each character and display correct number image
 
-        String sc = "" + (int) (score / 4);
-        String hc = "" + (int) (highScore / 4);
+        String sc = "" + (int) score ;
+        String hc = "" + (int) highScore;
 
         int xTemp = 750;
 
@@ -217,14 +221,11 @@ public class GUI extends JPanel implements KeyListener {
         g2d.setColor(pauseFade);
         g2d.fillRect(0, 0, width, height);
 
-        g2d.drawImage(pauseButton, width / 2 - 400, height / 2 - 150, 398*2, 126*2, null);
+        g2d.drawImage(pauseButton, width / 2 - 400, height / 2 - 150, 398 * 2, 126 * 2, null);
     }
 
 
     public void keyPressed(KeyEvent e) {
-
-        //For AudioThread - Updates track when key down
-        audioTrack.setPlaying(true);
 
         //Temporary comparison images for Doug's face movement
         Image dL = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Characters/DougDownLeft.png"))).getImage();
@@ -265,7 +266,7 @@ public class GUI extends JPanel implements KeyListener {
                 imgDigDug = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Characters/DougRight.png"))).getImage();
             }
 
-            case KeyEvent.VK_LEFT ->  {
+            case KeyEvent.VK_LEFT -> {
                 player.setVelX(-player.getVelocity());
                 imgDigDug = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Characters/DougLeft.png"))).getImage();
             }
@@ -279,35 +280,53 @@ public class GUI extends JPanel implements KeyListener {
                     pauseButton = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Empty.png"))).getImage();
                     pauseFade = new Color(0, 0, 0, 0);
                 }
+                pausePlay = !pausePlay;
+                repaint();
             }
         }
 
         //Move Doug with keyboard input, lock him inbounds
-        //player.walk(k);
         player.checkBounds();
     }
 
     public void keyReleased(KeyEvent e) {
 
         int c = e.getKeyCode();
+
         //For AudioThread - Updates track when key up
 
         if (c != KeyEvent.VK_ESCAPE) {
 
             switch (c) {
 
-                case KeyEvent.VK_UP, KeyEvent.VK_DOWN -> {
-                    player.setVelY(0);
-                }
-                case KeyEvent.VK_RIGHT, KeyEvent.VK_LEFT -> {
-                    player.setVelX(0);
-                }
+                case KeyEvent.VK_UP, KeyEvent.VK_DOWN -> player.setVelY(0);
+                case KeyEvent.VK_RIGHT, KeyEvent.VK_LEFT -> player.setVelX(0);
             }
-            //audioTrack.setPlaying(false);
-            //audioTrack.pause();
         }
     }
 
-    public void keyTyped(KeyEvent e) {}
+    public void saveScore() {
+
+        try {
+            PrintWriter pw = new PrintWriter("Assets/Scoreboard/highscore.txt");
+            pw.append(String.valueOf(highScore));
+            pw.close();
+        } catch (Exception ignored) {}
+    }
+
+    public void audioPlay() {
+
+        try {
+            AudioInputStream system = AudioSystem.getAudioInputStream(Objects.requireNonNull(getClass().getResource("Assets/theme.wav")));
+            Clip sound = AudioSystem.getClip();
+            sound.open(system);
+
+            sound.start();
+            sound.loop(Clip.LOOP_CONTINUOUSLY);
+        } catch (Exception ignored) {}
+    }
+
+    public void keyTyped(KeyEvent e) {
+    }
 }
 

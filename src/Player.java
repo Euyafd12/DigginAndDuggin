@@ -4,7 +4,12 @@ import java.util.*;
 
 public class Player {
 
-    private int x, y, lives, velX, velY, velocity;
+    private int x;
+    private int y;
+    private int lives;
+    private int velX;
+    private int velY;
+    private final int velocity;
     public ArrayList<Point> path;
 
     public Player() {
@@ -14,7 +19,7 @@ public class Player {
         y = 265;
         velX = 0;
         velY = 0;
-        velocity = 4;
+        velocity = 3;
 
         path = new ArrayList<>();
         path.add(new Point(x, y));
@@ -36,37 +41,8 @@ public class Player {
 
     public void escapeEnemy() {
 
-        //If Doug collides with enemy, find random area to teleport to in 600 x 600 rectangle
-
-        while (true) {
-
-            int tempX = (int) ((Math.random() * 400) - 200);
-            int tempY = (int) ((Math.random() * 400) - 200);
-
-            if ((x - tempX > -1 && x - tempX < 865) && (y - tempY > -1 && y - tempY < 650)) {
-                x -= tempX;
-                y -= tempY;
-                break;
-            }
-
-            if ((x + tempX > -1 && x + tempX < 865) && (y - tempY > -1 && y - tempY < 650)) {
-                x -= tempX;
-                y -= tempY;
-                break;
-            }
-
-            if ((x - tempX > -1 && x - tempX < 865) && (y + tempY > -1 && y + tempY < 650)) {
-                x -= tempX;
-                y -= tempY;
-                break;
-            }
-
-            if ((x + tempX > -1 && x + tempX < 865) && (y + tempY > -1 && y  + tempY < 650)) {
-                x -= tempX;
-                y -= tempY;
-                break;
-            }
-        }
+        x = 285;
+        y = 265;
     }
 
     public void tickWalk() {
@@ -82,25 +58,6 @@ public class Player {
     public void setVelY(int velY) {
         this.velY = velY;
     }
-
-    /*
-    public void walk(int e) {
-
-        //Moves Doug's position depending on keyboard input
-
-        switch (e) {
-
-            case 38 -> y -= velocity;
-
-            case 40 -> y += velocity;
-
-            case 39 -> x += velocity;
-
-            case 37 -> x -= velocity;
-        }
-    }
-    */
-
 
     public void checkBounds() {
 
