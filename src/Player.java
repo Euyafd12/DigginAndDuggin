@@ -1,14 +1,8 @@
-
 import java.awt.*;
 import java.util.*;
-
 public class Player {
 
-    private int x;
-    private int y;
-    private int lives;
-    private int velX;
-    private int velY;
+    private int x, y, lives, velX, velY;
     private final int velocity;
     public ArrayList<Point> path;
 
@@ -19,10 +13,9 @@ public class Player {
         y = 265;
         velX = 0;
         velY = 0;
-        velocity = 3;
+        velocity = 4;
 
         path = new ArrayList<>();
-        path.add(new Point(x, y));
     }
 
     public int getVelocity() {
@@ -61,7 +54,7 @@ public class Player {
 
     public void checkBounds() {
 
-        //Keep's Doug inbounds
+        //Keeps Doug inbounds
 
         if (x < 0) x = 0;
         if (x > 611) x = 611;

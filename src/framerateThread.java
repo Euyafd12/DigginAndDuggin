@@ -3,7 +3,6 @@ public class framerateThread extends Thread {
     private final GUI gui;
 
     public framerateThread(GUI g) {
-
         gui = g;
     }
 
@@ -12,6 +11,7 @@ public class framerateThread extends Thread {
         while (true) {
 
             System.out.print("");
+
             if (gui.isPausePlay()) {
 
                 //40 FPS
