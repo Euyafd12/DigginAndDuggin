@@ -1,12 +1,16 @@
 
 public class Enemy {
     private int x, y;
+    private String type;
     private final int velocity;
-    public Enemy() {
+    private boolean alive;
+    public Enemy(String type) {
 
         x = 125;
         y = 625;
         velocity = 0;
+        alive = true;
+        this.type = type;
     }
 
     public void walkTowards(int xPos, int yPos) {
@@ -31,6 +35,14 @@ public class Enemy {
         }
     }
 
+    public boolean isAlive() {
+        return alive;
+    }
+
+    public String getType() {
+        return type;
+    }
+
     public int getVelocity() {
         return velocity;
     }
@@ -41,5 +53,9 @@ public class Enemy {
 
     public int getY() {
         return y;
+    }
+
+    public void kill() {
+        alive = false;
     }
 }
