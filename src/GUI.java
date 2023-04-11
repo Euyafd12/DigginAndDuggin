@@ -6,16 +6,16 @@ import java.io.*;
 import java.util.*;
 public class GUI extends JPanel implements KeyListener {
     private Graphics2D g2d;
-    private int highScore, score, flip, add, displayFruit1;
-    private boolean pausePlay;
+    private int highScore, score, flip, add;
+    private boolean pausePlay, gameOver;
     private Color pauseFade;
-    private Image imgDigDug, pauseButton, Watermelon;
+    private Image imgDigDug, pauseButton;
     private final Player player;
     private final Enemy enemy;
     private final int width, height;
-    private final Image ICN, plus300;
-    private final Rectangle waterbox;
+    private final Image ICN, plus300, endScreen, imgScore, imgHiScore, watermelon, pineapple, carrot;
     private final Map<String, Image> scoreMap;
+    private final ArrayList<Fruit> fruitList;
     private final ArrayList<Rectangle> scoreList;
 
     public GUI() throws FileNotFoundException {
@@ -27,20 +27,42 @@ public class GUI extends JPanel implements KeyListener {
 
         pauseFade = new Color(0, 0, 0, 0);
         pausePlay = true;
+        gameOver = false;
 
         width = 915;
         height = 1040;
         flip = 1;
-        score = 0;
+        score = -5;
         add = 0;
-        displayFruit1 = 0;
 
         highScore = new Scanner(new File("src/Assets/Scoreboard/highscore.txt")).nextInt();
 
         scoreMap = new HashMap<>();
         scoreList = new ArrayList<>();
+        fruitList = new ArrayList<>();
 
-        //Load in map of scoreboard numbers
+        Fruit melon = new Fruit();
+        Fruit karot = new Fruit();
+        Fruit carot = new Fruit();
+        Fruit pineP = new Fruit();
+
+        melon.setBounds(500, 625, 48, 27);
+        melon.setType("Watermelon");
+
+        karot.setBounds(125, 350, 42, 39);
+        karot.setType("Carrot");
+
+        carot.setBounds(457, 850, 42, 39);
+        carot.setType("Carrot");
+
+        pineP.setBounds(75, 950, 30, 45);
+        pineP.setType("Pineapple");
+
+        fruitList.add(melon);
+        fruitList.add(karot);
+        fruitList.add(carot);
+        fruitList.add(pineP);
+
         for (int i = 0; i < 10; i++) {
             scoreMap.put(String.valueOf(i), new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Scoreboard/Score" + i + ".png"))).getImage());
         }
@@ -48,18 +70,27 @@ public class GUI extends JPanel implements KeyListener {
         imgDigDug = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Characters/DougSide.png"))).getImage();
         ICN = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Background/DigDugIcon.jpg"))).getImage();
         pauseButton = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Empty.png"))).getImage();
-        Watermelon = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Background/Watermelon.png"))).getImage();
+
+        watermelon = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Background/Watermelon.png"))).getImage();
+        carrot = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Background/Carrot.png"))).getImage();
+        pineapple = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Background/Pineapple.png"))).getImage();
+
         plus300 = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Scoreboard/Points300.png"))).getImage();
-
-
-        waterbox = new Rectangle(500, 625, 48, 27);
+        endScreen = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Background/Game_Over.png"))).getImage();
+        imgScore = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Scoreboard/imgScore.png"))).getImage();
+        imgHiScore = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Scoreboard/imgHi-Score.png"))).getImage();
     }
+
     public Player getPlayer() {
         return player;
     }
 
     public boolean isPausePlay() {
         return pausePlay;
+    }
+
+    public void endGame() {
+        gameOver = !gameOver;
     }
 
     public void display() {
@@ -70,6 +101,7 @@ public class GUI extends JPanel implements KeyListener {
         frame.setIconImage(ICN);
 
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
         frame.setSize(width, height);
         frame.setVisible(true);
         frame.setResizable(false);
@@ -78,7 +110,6 @@ public class GUI extends JPanel implements KeyListener {
         frame.addWindowListener(new WindowAdapter() {
 
             public void windowClosing(WindowEvent e) {
-                //On [X} click, clear highscore.txt, write new highscore and close the file
                 saveScore();
             }
         });
@@ -89,13 +120,10 @@ public class GUI extends JPanel implements KeyListener {
 
         Image imgBackground = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Background/background.png"))).getImage();
         Image imgLogo = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Background/Logo.png"))).getImage();
-        Image imgScore = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Scoreboard/imgScore.png"))).getImage();
-        Image imgHiScore = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Scoreboard/imgHi-Score.png"))).getImage();
 
         g2d.setColor(Color.BLACK);
         g2d.fillRect(0, 0, width, height);
 
-        //Draw each piece of background
         g2d.drawImage(imgLogo, 100, -10, 714, 318, null);
         g2d.drawImage(imgScore, 700, 400, 117, 21, null);
         g2d.drawImage(imgHiScore, 700, 500, 144, 48, null);
@@ -105,17 +133,18 @@ public class GUI extends JPanel implements KeyListener {
         g2d.drawImage(imgBackground, 360, 300, 181, 700, null);
         g2d.drawImage(imgBackground, 470, 300, 181, 700, null);
 
-        //Draw lives icon, reduced with each death
         int tempPos = 675;
 
-        for (int i = 0; i < player.getLives(); i++) {
+        for (int i = 0; i < player.getLives() - 1; i++) {
 
             g2d.drawImage(new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Characters/DougSide.png"))).getImage(), tempPos, 720, 100, 100, null);
             tempPos += 110;
         }
 
-        g2d.fillRect(460, 610, 128, 40);
-        g2d.drawImage(Watermelon, 500, 625, 48, 27, null);
+        g2d.fillRect(460, 612, 128, 40);
+        g2d.fillRect(79, 339, 128, 50);
+        g2d.fillRect(412, 839, 128, 50);
+        g2d.fillRect(28, 937, 128, 58);
     }
 
     public void paintComponent(Graphics window) {
@@ -123,84 +152,61 @@ public class GUI extends JPanel implements KeyListener {
         super.paintComponent(window);
         g2d = (Graphics2D) window;
 
-        //Display Background
-        prepGUI();
+        if (gameOver) closeGame();
 
-        int pX = player.getX();
-        int pY = player.getY();
+        else {
 
-        //Draw Scoreboard
-        Rectangle rec = new Rectangle(pX, pY, 40, 40);
+            prepGUI();
 
-        boolean check = true;
-        for (Rectangle rc : scoreList) {
+            int pX = player.getX();
+            int pY = player.getY();
 
-            if (rc.intersects(rec)) {
-                check = false;
+            Rectangle rec = new Rectangle(pX, pY, 40, 40);
+
+            boolean check = true;
+            for (Rectangle rc : scoreList) {
+
+                if (rc.intersects(rec)) {
+                    check = false;
+                }
             }
-        }
 
-        if (check) {
-            score += 5;
-            scoreList.add(rec);
-        }
+            if (check) {
+                score += 5;
+                scoreList.add(rec);
+            }
 
-        if (score > highScore) {
-            highScore = score;
-        }
+            if (score > highScore) {
+                highScore = score;
+            }
 
-        drawScore();
+            drawScore();
 
-        //Display Doug
-        g2d.fillRect(pX, pY, 40, 40);
-        drawPath();
-        drawDigDug();
+            g2d.fillRect(pX, pY, 40, 40);
+            drawPath();
+            drawDigDug();
 
-        //Make enemy move towards Doug and display
-        enemy.walkTowards(pX, pY);
-        drawEnemy();
+            enemy.walkTowards(pX, pY);
+            drawEnemy();
 
-        //Check for collision between Doug and enemy
-        collisionCheck();
+            collisionCheck();
+            drawFruit();
 
-        //Use [Escape] as switch, if on - display pause menu and freeze game
-        drawPause();
-
-        if (waterbox.width == 0 && displayFruit1 < 40) {
-            g2d.drawImage(plus300, 500, 625 - displayFruit1, 48, 27, null);
-            displayFruit1++;
-        }
-    }
-
-    public void drawScore() {
-
-        //Represent score as string, go through each character and display correct number image
-
-        String sc = "" + score;
-        String hc = "" + highScore;
-
-        int xTemp = 750;
-
-        for (int i = 0; i < sc.length(); i++) {
-
-            g2d.drawImage(scoreMap.get(sc.substring(i, i + 1)), xTemp, 445, 24, 24, null);
-            xTemp += 24;
-        }
-
-        xTemp = 750;
-
-        for (int i = 0; i < hc.length(); i++) {
-
-            g2d.drawImage(scoreMap.get(hc.substring(i, i + 1)), xTemp, 583, 24, 24, null);
-            xTemp += 24;
+            drawPause();
         }
     }
 
     public void drawDigDug() {
 
-        //Draw Doug, add position to existing path list
-        g2d.drawImage(imgDigDug, player.getX() + add, player.getY(), 40 * flip , 40, null);
+        g2d.drawImage(imgDigDug, player.getX() + add, player.getY(), 40 * flip, 40, null);
         player.path.add(new Point(player.getX(), player.getY()));
+    }
+
+    public void drawPath() {
+
+        for (Point p : player.path) {
+            g2d.fillRect(p.x, p.y, 40, 40);
+        }
     }
 
     public void drawEnemy() {
@@ -209,27 +215,8 @@ public class GUI extends JPanel implements KeyListener {
         g2d.drawImage(img, enemy.getX(), enemy.getY(), 40, 40, null);
     }
 
-    public void drawPath() {
-
-        //Draw boxes to represent Doug's dug path
-        for (Point p : player.path) {
-            g2d.fillRect(p.x, p.y, 40, 40);
-        }
-    }
-
-    public void drawPause() {
-
-        //Draw pause menu, if [Escape] switch on, color background transparent black and draw pause button
-
-        g2d.setColor(pauseFade);
-        g2d.fillRect(0, 0, width, height);
-
-        g2d.drawImage(pauseButton, width / 2 - 400, (height / 2 - 150), 796, 252, null);
-    }
-
     public void collisionCheck() {
 
-        //See if Doug and Enemy intersect, lose life and teleport Doug away
         Rectangle plyr = new Rectangle(player.getX(), player.getY(), 40, 40);
         Rectangle enmy = new Rectangle(enemy.getX(), enemy.getY(), 40, 40);
 
@@ -240,13 +227,106 @@ public class GUI extends JPanel implements KeyListener {
             repaint();
         }
 
-        if (plyr.intersects(waterbox)) {
+        for (Fruit f : fruitList) {
+            if (!f.isEaten() && f.getBounds().intersects(plyr)) {
+                f.eat();
+                score += 300;
+            }
+        }
+    }
 
-            Watermelon = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Empty.png"))).getImage();
-            score += 300;
-            waterbox.setSize(0, 0);
+    public void drawFruit() {
+
+        for (Fruit f : fruitList) {
+
+            if (f.isEaten() && f.getAppearCNT() < 40) {
+                g2d.drawImage(plus300,f.getBounds().x + (f.getBounds().width / 2) - 24,f.getBounds().y - f.getAppearCNT(), 48, 27, null);
+                f.upAppearCNT();
+            }
+
+            if (!f.isEaten()) {
+
+                switch (f.getType()) {
+
+                    case "Watermelon" -> g2d.drawImage(watermelon, f.getBounds().x, f.getBounds().y, f.getBounds().width, f.getBounds().height, null);
+                    case "Carrot" -> g2d.drawImage(carrot, f.getBounds().x, f.getBounds().y, f.getBounds().width, f.getBounds().height, null);
+                    case "Pineapple" -> g2d.drawImage(pineapple, f.getBounds().x, f.getBounds().y, f.getBounds().width, f.getBounds().height, null);
+                }
+            }
+        }
+    }
+
+    public void drawPause() {
+
+        g2d.setColor(pauseFade);
+        g2d.fillRect(0, 0, width, height);
+
+        g2d.drawImage(pauseButton, width / 2 - 400, (height / 2 - 150), 796, 252, null);
+    }
+
+    public void drawScore() {
+
+        String sc = "" + score;
+        String hc = "" + highScore;
+
+        int xTemp = 750;
+
+        if (!gameOver) {
+
+            for (int i = 0; i < sc.length(); i++) {
+
+                g2d.drawImage(scoreMap.get(sc.substring(i, i + 1)), xTemp, 445, 24, 24, null);
+                xTemp += 24;
+            }
+
+            xTemp = 750;
+
+            for (int i = 0; i < hc.length(); i++) {
+
+                g2d.drawImage(scoreMap.get(hc.substring(i, i + 1)), xTemp, 583, 24, 24, null);
+                xTemp += 24;
+            }
         }
 
+        else {
+
+            xTemp = ((195 - (sc.length() * 48)) / 2) + 561;
+
+            for (int i = 0; i < sc.length(); i++) {
+
+                g2d.drawImage(scoreMap.get(sc.substring(i, i + 1)), xTemp, 625, 48, 48, null);
+                xTemp += 48;
+            }
+
+            xTemp = ((230 - (hc.length() * 48)) / 2) + 125;
+
+            for (int i = 0; i < hc.length(); i++) {
+
+                g2d.drawImage(scoreMap.get(hc.substring(i, i + 1)), xTemp, 625, 48, 48, null);
+                xTemp += 48;
+            }
+        }
+    }
+
+    public void saveScore() {
+
+        try {
+            PrintWriter pw = new PrintWriter("src/Assets/Scoreboard/highscore.txt");
+            pw.append(String.valueOf(highScore));
+            pw.close();
+        } catch (Exception ignored) {}
+    }
+
+    public void closeGame() {
+
+        g2d.setColor(Color.BLACK);
+        g2d.fillRect(0, 0, width, height);
+
+        g2d.drawImage(endScreen, 302, 150, 310, 170, null);
+        g2d.drawImage(imgHiScore, 125, 500, 230, 80, null);
+        g2d.drawImage(imgScore, 561, 545, 195, 35, null);
+
+        drawScore();
     }
 
     public void keyPressed(KeyEvent e) {
@@ -265,24 +345,27 @@ public class GUI extends JPanel implements KeyListener {
             imgDigDug = dgSide;
 
             if (k == KeyEvent.VK_LEFT) {
+
                 player.setVelX(-player.getVelocity());
                 flip = -1;
                 add = 40;
             } else {
+
                 player.setVelX(player.getVelocity());
                 flip = 1;
                 add = 0;
             }
         }
-
         else if (player.getVelX() == 0) {
 
             if (k == KeyEvent.VK_UP) {
+
                 player.setVelY(-player.getVelocity());
                 imgDigDug = dgUp;
             }
 
             if (k == KeyEvent.VK_DOWN) {
+
                 player.setVelY(player.getVelocity());
                 imgDigDug = dgDown;
             }
@@ -293,17 +376,17 @@ public class GUI extends JPanel implements KeyListener {
             Image pB = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/PauseButton.png"))).getImage();
 
             if (!pauseButton.equals(pB)) {
+
                 pauseButton = pB;
                 pauseFade = new Color(0, 0, 0, 180);
             } else {
+
                 pauseButton = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Empty.png"))).getImage();
                 pauseFade = new Color(0, 0, 0, 0);
             }
             pausePlay = !pausePlay;
-            repaint();
         }
 
-        //Move Doug with keyboard input, lock him inbounds
         player.checkBounds();
     }
 
@@ -314,15 +397,6 @@ public class GUI extends JPanel implements KeyListener {
             case KeyEvent.VK_UP, KeyEvent.VK_DOWN -> player.setVelY(0);
             case KeyEvent.VK_RIGHT, KeyEvent.VK_LEFT -> player.setVelX(0);
         }
-    }
-
-    public void saveScore() {
-
-        try {
-            PrintWriter pw = new PrintWriter("src/Assets/Scoreboard/highscore.txt");
-            pw.append(String.valueOf(highScore));
-            pw.close();
-        } catch (Exception ignored) {}
     }
 
     public void audioPlay() {
@@ -337,10 +411,5 @@ public class GUI extends JPanel implements KeyListener {
     }
 
     public void keyTyped(KeyEvent e) {}
-
-    public static void main(String[] args) throws FileNotFoundException {
-
-        new GUI().display();
-    }
 }
 

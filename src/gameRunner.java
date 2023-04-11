@@ -11,12 +11,18 @@ public class gameRunner {
 
         while (true) {
 
-            //End game when lives hit 0
             System.out.print("");
-            if (gui.getPlayer().getLives() < 0) {
+            if (gui.getPlayer().getLives() == 0) {
 
-                System.out.println("Game Over!");
+                frameThread.interrupt();
                 gui.saveScore();
+                gui.endGame();
+                gui.repaint();
+
+                try {
+                    Thread.sleep(5000);
+                } catch (Exception ignored) {}
+
                 System.exit(999999999);
             }
         }

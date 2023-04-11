@@ -8,7 +8,7 @@ public class Player {
 
     public Player() {
 
-        lives = 2;
+        lives = 3;
         x = 285;
         y = 265;
         velX = 0;

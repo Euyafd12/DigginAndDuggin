@@ -6,7 +6,7 @@ public class Enemy {
 
         x = 125;
         y = 625;
-        velocity = 3;
+        velocity = 0;
     }
 
     public void walkTowards(int xPos, int yPos) {
