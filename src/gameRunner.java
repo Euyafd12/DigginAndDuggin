@@ -1,4 +1,3 @@
-
 public class gameRunner {
 
     public static void main(String[] args) throws Exception {
@@ -12,7 +11,7 @@ public class gameRunner {
         while (true) {
 
             System.out.print("");
-            if (gui.getPlayer().getLives() == 0) {
+            if (gui.getPlayer().getLives() < 1 || gui.getEnemyList().size() < 1) {
 
                 frameThread.interrupt();
                 gui.saveScore();

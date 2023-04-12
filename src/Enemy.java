@@ -1,21 +1,19 @@
-
 public class Enemy {
-    private int x, y;
-    private String type;
-    private final int velocity;
+
+    private int x, y, appearCNT, velocity;
+    private final String type;
     private boolean alive;
     public Enemy(String type) {
 
-        x = 125;
-        y = 625;
+        x = 0;
+        y = 0;
         velocity = 0;
+        appearCNT = 0;
         alive = true;
         this.type = type;
     }
 
     public void walkTowards(int xPos, int yPos) {
-
-        //Finds longest axis of travel, then moves towards Doug in correct direction
 
         if (Math.abs(x - xPos) > Math.abs(y - yPos)) {
 
@@ -35,27 +33,32 @@ public class Enemy {
         }
     }
 
+    public void setPos(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
+    public void setVelocity(int velocity) {
+        this.velocity = velocity;
+    }
+    public int getAppearCNT() {
+        return appearCNT;
+    }
     public boolean isAlive() {
         return alive;
     }
-
     public String getType() {
         return type;
     }
-
-    public int getVelocity() {
-        return velocity;
-    }
-
     public int getX() {
         return x;
     }
-
     public int getY() {
         return y;
     }
-
     public void kill() {
         alive = false;
+    }
+    public void upAppearCNT() {
+        appearCNT++;
     }
 }
