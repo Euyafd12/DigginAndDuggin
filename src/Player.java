@@ -2,7 +2,7 @@ import java.awt.*;
 import java.util.*;
 public class Player {
 
-    private int x, y, lives, velX, velY;
+    private int x, y, lives, velX, velY, killCNT;
     private final int velocity;
     public ArrayList<Point> path;
 
@@ -16,6 +16,10 @@ public class Player {
         velocity = 4;
 
         path = new ArrayList<>();
+    }
+
+    public int getKillCNT() {
+        return killCNT;
     }
 
     public int getVelocity() {
@@ -32,16 +36,38 @@ public class Player {
         return y;
     }
 
-    public void escapeEnemy() {
+    public void escapeEnemy(ArrayList<Enemy> enemyList) {
 
-        x = 285;
-        y = 265;
+        boolean repeat = false;
+        int a = 0;
+        int b = 0;
+
+        while (!repeat) {
+
+            a = (int) (Math.random() * 611);
+            b = (int) (Math.random() * 690) + 270;
+
+            for (Enemy enemy : enemyList) {
+
+                if (Math.sqrt(Math.pow((x - enemy.getX()), 2) + Math.pow((enemy.getY() - b), 2)) < 100) {
+                    repeat = true;
+                    break;
+                }
+            }
+        }
+
+        x = a;
+        y = b;
     }
 
     public void tickWalk() {
 
         x += velX;
         y += velY;
+    }
+
+    public void kill() {
+        killCNT++;
     }
 
     public void setVelX(int velX) {
@@ -53,8 +79,6 @@ public class Player {
     }
 
     public void checkBounds() {
-
-        //Keeps Doug inbounds
 
         if (x < 0) x = 0;
         if (x > 611) x = 611;

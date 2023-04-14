@@ -11,7 +11,11 @@ public class gameRunner {
         while (true) {
 
             System.out.print("");
-            if (gui.getPlayer().getLives() < 1 || gui.getEnemyList().size() < 1) {
+            if (gui.getPlayer().getLives() < 1 || (gui.getPlayer().getKillCNT() == gui.getEnemyList().size())) {
+
+                if (gui.getPlayer().getLives() < 1) {
+                    gui.setIdk2("Lose Screen");
+                }
 
                 frameThread.interrupt();
                 gui.saveScore();
