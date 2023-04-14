@@ -64,7 +64,7 @@ public class GUI extends JPanel implements KeyListener {
         idk = "RIGHT";
         idk2 = "Win Screen";
 
-        highScore = new Scanner(new File("src/Assets/Scoreboard/highscore.txt")).nextInt();
+        highScore = new Scanner(new File("highscore.txt")).nextInt();
 
         scoreTiles = new HashMap<>();
         scoreList = new ArrayList<>();
@@ -408,8 +408,9 @@ public class GUI extends JPanel implements KeyListener {
     public void saveScore() {
 
         try {
-            PrintWriter pw = new PrintWriter("src/Assets/Scoreboard/highscore.txt");
+            PrintWriter pw = new PrintWriter("highscore.txt");
             pw.append(String.valueOf(highScore));
+            System.out.println(String.valueOf(highScore));
             pw.close();
         } catch (Exception ignored) {}
     }
