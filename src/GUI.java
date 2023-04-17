@@ -42,7 +42,7 @@ public class GUI extends JPanel implements KeyListener {
         two.setVelocity(2);
         three.setVelocity(3);
         four.setVelocity(2);
-        five.setVelocity(4);
+        five.setVelocity(3);
 
         enemyList.add(one);
         enemyList.add(two);
@@ -98,7 +98,7 @@ public class GUI extends JPanel implements KeyListener {
 
         imgDigDug = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Characters/DougSide.png"))).getImage();
         ICN = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Background/DigDugIcon.jpg"))).getImage();
-        pauseButton = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Empty.png"))).getImage();
+        pauseButton = new ImageIcon(Objects.requireNonNull(getClass().getResource("/Assets/Empty.png"))).getImage();
         weapon = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Empty.png"))).getImage();
 
         watermelon = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Background/Watermelon.png"))).getImage();
@@ -111,10 +111,6 @@ public class GUI extends JPanel implements KeyListener {
         gameWinScreen = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Background/You_Win.png"))).getImage();
         imgScore = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Scoreboard/imgScore.png"))).getImage();
         imgHiScore = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Scoreboard/imgHi-Score.png"))).getImage();
-    }
-
-    public void endGame() {
-        gameOver = !gameOver;
     }
 
     public void display() {
@@ -297,6 +293,57 @@ public class GUI extends JPanel implements KeyListener {
         }
     }
 
+    public void drawPause() {
+
+        g2d.setColor(pauseFade);
+        g2d.fillRect(0, 0, width, height);
+        g2d.drawImage(pauseButton, width / 2 - 400, (height / 2 - 150), 796, 252, null);
+    }
+
+    public void drawScore() {
+
+        String sc = "" + score;
+        String hc = "" + highScore;
+
+        int xTemp = 750;
+
+        if (!gameOver) {
+
+            for (int i = 0; i < sc.length(); i++) {
+
+                g2d.drawImage(scoreTiles.get(sc.substring(i, i + 1)), xTemp, 445, 24, 24, null);
+                xTemp += 24;
+            }
+
+            xTemp = 750;
+
+            for (int i = 0; i < hc.length(); i++) {
+
+                g2d.drawImage(scoreTiles.get(hc.substring(i, i + 1)), xTemp, 583, 24, 24, null);
+                xTemp += 24;
+            }
+        }
+
+        else {
+
+            xTemp = ((195 - (sc.length() * 48)) / 2) + 561;
+
+            for (int i = 0; i < sc.length(); i++) {
+
+                g2d.drawImage(scoreTiles.get(sc.substring(i, i + 1)), xTemp, 625, 48, 48, null);
+                xTemp += 48;
+            }
+
+            xTemp = ((230 - (hc.length() * 48)) / 2) + 125;
+
+            for (int i = 0; i < hc.length(); i++) {
+
+                g2d.drawImage(scoreTiles.get(hc.substring(i, i + 1)), xTemp, 625, 48, 48, null);
+                xTemp += 48;
+            }
+        }
+    }
+
     public void collisionCheck() {
 
         Rectangle plyr = new Rectangle(player.getX(), player.getY(), 40, 40);
@@ -354,63 +401,11 @@ public class GUI extends JPanel implements KeyListener {
         }
     }
 
-    public void drawPause() {
-
-        g2d.setColor(pauseFade);
-        g2d.fillRect(0, 0, width, height);
-        g2d.drawImage(pauseButton, width / 2 - 400, (height / 2 - 150), 796, 252, null);
-    }
-
-    public void drawScore() {
-
-        String sc = "" + score;
-        String hc = "" + highScore;
-
-        int xTemp = 750;
-
-        if (!gameOver) {
-
-            for (int i = 0; i < sc.length(); i++) {
-
-                g2d.drawImage(scoreTiles.get(sc.substring(i, i + 1)), xTemp, 445, 24, 24, null);
-                xTemp += 24;
-            }
-
-            xTemp = 750;
-
-            for (int i = 0; i < hc.length(); i++) {
-
-                g2d.drawImage(scoreTiles.get(hc.substring(i, i + 1)), xTemp, 583, 24, 24, null);
-                xTemp += 24;
-            }
-        }
-
-        else {
-
-            xTemp = ((195 - (sc.length() * 48)) / 2) + 561;
-
-            for (int i = 0; i < sc.length(); i++) {
-
-                g2d.drawImage(scoreTiles.get(sc.substring(i, i + 1)), xTemp, 625, 48, 48, null);
-                xTemp += 48;
-            }
-
-            xTemp = ((230 - (hc.length() * 48)) / 2) + 125;
-
-            for (int i = 0; i < hc.length(); i++) {
-
-                g2d.drawImage(scoreTiles.get(hc.substring(i, i + 1)), xTemp, 625, 48, 48, null);
-                xTemp += 48;
-            }
-        }
-    }
-
     public void saveScore() {
 
         try {
             PrintWriter pw = new PrintWriter("highscore.txt");
             pw.append(String.valueOf(highScore));
-            System.out.println(String.valueOf(highScore));
             pw.close();
         } catch (Exception ignored) {}
     }
@@ -497,6 +492,8 @@ public class GUI extends JPanel implements KeyListener {
             if (!pauseButton.equals(pB)) {
                 pauseButton = pB;
                 pauseFade = new Color(0, 0, 0, 180);
+                repaint();
+
             }
             else {
                 pauseButton = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Empty.png"))).getImage();
@@ -548,6 +545,10 @@ public class GUI extends JPanel implements KeyListener {
 
     public boolean isPausePlay() {
         return pausePlay;
+    }
+
+    public void endGame() {
+        gameOver = !gameOver;
     }
 }
 
