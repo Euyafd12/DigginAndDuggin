@@ -14,7 +14,7 @@ public class gameRunner {
             if (gui.getPlayer().getLives() < 1 || (gui.getPlayer().getKillCNT() == gui.getEnemyList().size())) {
 
                 if (gui.getPlayer().getLives() < 1) {
-                    gui.setIdk2("Lose Screen");
+                    gui.setGameEndScreen("Lose");
                 }
 
                 frameThread.interrupt();

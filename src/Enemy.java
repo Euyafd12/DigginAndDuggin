@@ -1,18 +1,23 @@
 public class Enemy {
 
-    private int x, y, appearCNT, velocity;
-    private String movePath;
+    private int x, y, appearCNT, velocity, add, flip;
+    private String movePath, direction;
     private final String type;
     private boolean alive;
     public Enemy(String type, String movePath) {
 
         x = 0;
         y = 0;
-        this.movePath = movePath;
+        add = 0;
+        flip = 1;
         velocity = 0;
         appearCNT = 0;
-        alive = true;
+
         this.type = type;
+        this.movePath = movePath;
+        direction = movePath;
+
+        alive = true;
     }
 
     public void move(int xPos, int yPos) {
@@ -44,16 +49,28 @@ public class Enemy {
 
             if (x - xPos > 0) {
                 x -= velocity;
+                flip = -1;
+                add = 40;
+                direction = "Left";
             }
-            else x += velocity;
+            else {
+                x += velocity;
+                flip = 1;
+                add = 0;
+                direction = "Right";
+            }
 
         }
         else {
 
             if (y - yPos > 0) {
                 y -= velocity;
+                direction = "Up";
             }
-            else y += velocity;
+            else {
+                y += velocity;
+                direction = "Down";
+            }
         }
     }
 
@@ -61,8 +78,24 @@ public class Enemy {
 
         if (movePath.equals("Left")) {
             x -= velocity;
+            flip = -1;
+            add = 40;
+            direction = "Left";
         }
-        else x += velocity;
+        else {
+            x += velocity;
+            flip = 1;
+            add = 0;
+            direction = "Right";
+        }
+    }
+
+    public void die() {
+        alive = false;
+    }
+
+    public void upAppearCNT() {
+        appearCNT++;
     }
 
     public void setPos(int x, int y) {
@@ -70,28 +103,40 @@ public class Enemy {
         this.x = x;
         this.y = y;
     }
+
     public void setVelocity(int velocity) {
         this.velocity = velocity;
     }
+
+    public String getDirection() {
+        return direction;
+    }
+
+    public int getAdd() {
+        return add;
+    }
+
+    public int getFlip() {
+        return flip;
+    }
+
     public int getAppearCNT() {
         return appearCNT;
     }
+
     public boolean isAlive() {
         return alive;
     }
+
     public String getType() {
         return type;
     }
+
     public int getX() {
         return x;
     }
+
     public int getY() {
         return y;
-    }
-    public void die() {
-        alive = false;
-    }
-    public void upAppearCNT() {
-        appearCNT++;
     }
 }

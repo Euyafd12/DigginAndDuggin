@@ -6,18 +6,19 @@ import java.io.*;
 import java.util.*;
 public class GUI extends JPanel implements KeyListener {
     private Graphics2D g2d;
-    private int highScore, score, flip, add;
+    private int highScore, score;
+    private String gameEndScreen;
     private boolean pausePlay, gameOver, gunOut;
     private Color pauseFade;
     private Image imgDigDug, pauseButton, weapon;
-    private String idk, idk2;
-    private final Player player;
-    private final ArrayList<Enemy> enemyList;
     private final int width, height;
-    private final Image ICN, plus300, plus1000, gameLoseScreen, gameWinScreen, imgScore, imgHiScore, watermelon, pineapple, carrot;
+    private final Player player;
+    private final Image ICN, plus300, plus1000, imgScore, imgHiScore, watermelon, pineapple, carrot;
     private final Map<String, Image> scoreTiles;
     private final ArrayList<Fruit> fruitList;
+    private final ArrayList<Enemy> enemyList;
     private final ArrayList<Rectangle> scoreList;
+
 
     public GUI() throws FileNotFoundException {
 
@@ -57,12 +58,9 @@ public class GUI extends JPanel implements KeyListener {
 
         width = 915;
         height = 1040;
-        flip = 1;
         score = -5;
-        add = 0;
 
-        idk = "RIGHT";
-        idk2 = "Win Screen";
+        gameEndScreen = "Win";
 
         highScore = new Scanner(new File("highscore.txt")).nextInt();
 
@@ -107,8 +105,6 @@ public class GUI extends JPanel implements KeyListener {
 
         plus300 = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Scoreboard/Points300.png"))).getImage();
         plus1000 = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Scoreboard/Points1000.png"))).getImage();
-        gameLoseScreen = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Background/Game_Over.png"))).getImage();
-        gameWinScreen = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Background/You_Win.png"))).getImage();
         imgScore = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Scoreboard/imgScore.png"))).getImage();
         imgHiScore = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Scoreboard/imgHi-Score.png"))).getImage();
     }
@@ -184,6 +180,7 @@ public class GUI extends JPanel implements KeyListener {
             Rectangle rec = new Rectangle(pX, pY, 40, 40);
 
             boolean check = true;
+
             for (Rectangle rc : scoreList) {
 
                 if (rc.intersects(rec)) {
@@ -221,7 +218,7 @@ public class GUI extends JPanel implements KeyListener {
 
     public void drawDigDug() {
 
-        g2d.drawImage(imgDigDug, player.getX() + add, player.getY(), 40 * flip, 40, null);
+        g2d.drawImage(imgDigDug, player.getX() + player.getAdd(), player.getY(), 40 * player.getFlip(), 40, null);
         player.path.add(new Point(player.getX(), player.getY()));
     }
 
@@ -234,11 +231,11 @@ public class GUI extends JPanel implements KeyListener {
 
     public void drawWeapon() {
 
-        switch (idk) {
+        switch (player.getDirection()) {
 
-            case "RIGHT", "LEFT" -> g2d.drawImage(weapon, player.getX() + 20, player.getY() + 20, 64 * flip, 10, null);
-            case "UP" -> g2d.drawImage(weapon, player.getX() + 20, player.getY() - 40, 10 * flip,64, null);
-            case "DOWN" -> g2d.drawImage(weapon, player.getX() + 20, player.getY() + 80, -10 * flip,-64, null);
+            case "Right", "Left" -> g2d.drawImage(weapon, player.getX() + 20, player.getY() + 20, 64 * player.getFlip(), 10, null);
+            case "Up" -> g2d.drawImage(weapon, player.getX() + 20, player.getY() - 40, 10 * player.getFlip(),64, null);
+            case "Down" -> g2d.drawImage(weapon, player.getX() + 20, player.getY() + 80, -10 * player.getFlip(),-64, null);
         }
     }
 
@@ -250,19 +247,19 @@ public class GUI extends JPanel implements KeyListener {
             }
         }
 
-        Image goggles = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Characters/GogglesRight.png"))).getImage();
-        Image dragon = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Characters/DragonLeft.png"))).getImage();
-
         for (Enemy enemy : enemyList) {
 
             if (enemy.isAlive()) {
 
-                if (enemy.getType().equals("Goggles")) {
-                    g2d.drawImage(goggles, enemy.getX(), enemy.getY(), 40, 40, null);
+                String temp = enemy.getDirection();
+
+                if (temp.equals("Left") || temp.equals("Right")) {
+                    temp = "Side";
                 }
-                else {
-                    g2d.drawImage(dragon, enemy.getX(), enemy.getY(), 40, 40, null);
-                }
+
+                Image image = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Characters/" + enemy.getType() + temp + ".png"))).getImage();
+                g2d.drawImage(image, enemy.getX() + enemy.getAdd(), enemy.getY(), 40 * enemy.getFlip(), 40, null);
+
             }
             else if (enemy.getAppearCNT() < 40) {
                 g2d.drawImage(plus1000,enemy.getX() + 20 - 24,enemy.getY() - enemy.getAppearCNT(), 48, 27, null);
@@ -284,12 +281,10 @@ public class GUI extends JPanel implements KeyListener {
                     case "Pineapple" -> g2d.drawImage(pineapple, f.getBounds().x, f.getBounds().y, f.getBounds().width, f.getBounds().height, null);
                 }
             }
-
             else if (f.getAppearCNT() < 40) {
                 g2d.drawImage(plus300,f.getBounds().x + (f.getBounds().width / 2) - 24,f.getBounds().y - f.getAppearCNT(), 48, 27, null);
                 f.upAppearCNT();
             }
-
         }
     }
 
@@ -349,22 +344,22 @@ public class GUI extends JPanel implements KeyListener {
         Rectangle plyr = new Rectangle(player.getX(), player.getY(), 40, 40);
         Rectangle weap = new Rectangle();
 
-        switch (idk) {
+        switch (player.getDirection()) {
 
-            case "RIGHT" -> weap.setBounds((player.getX() + 20), player.getY() + 20, 64 * flip, 10);
-            case "LEFT" -> weap.setBounds((player.getX() + 20) - 64, player.getY() + 20, 64, 10);
+            case "Right" -> weap.setBounds((player.getX() + 20), player.getY() + 20, 64 * player.getFlip(), 10);
+            case "Left" -> weap.setBounds((player.getX() + 20) - 64, player.getY() + 20, 64, 10);
 
-            case "UP" -> {
+            case "Up" -> {
 
-                if (flip == 1) {
+                if (player.getFlip() == 1) {
                     weap.setBounds(player.getX() + 20, player.getY() - 40, 10, 64);
                 }
                 else weap.setBounds(player.getX() + 10, player.getY() - 40, 10, 64);
             }
 
-            case "DOWN" -> {
+            case "Down" -> {
 
-                if (flip == 1) {
+                if (player.getFlip() == 1) {
                     weap.setBounds(player.getX() + 10, player.getY() + 20, 10, 64);
                 }
                 else weap.setBounds(player.getX() + 20, player.getY() + 20, 10, 64);
@@ -415,10 +410,12 @@ public class GUI extends JPanel implements KeyListener {
         g2d.setColor(Color.BLACK);
         g2d.fillRect(0, 0, width, height);
 
-        if (idk2.equals("Lose Screen")) {
-            g2d.drawImage(gameLoseScreen, 302, 150, 310, 170, null);
+        Image screen = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Background/You" + gameEndScreen + ".png"))).getImage();
+
+        if (gameEndScreen.equals("Lose")) {
+            g2d.drawImage(screen, 302, 150, 310, 170, null);
         }
-        else g2d.drawImage(gameWinScreen, (width / 2) - (300 / 2), 150, 300, 150, null);
+        else g2d.drawImage(screen, (width / 2) - (300 / 2), 150, 300, 150, null);
 
         g2d.drawImage(imgHiScore, 125, 500, 230, 80, null);
         g2d.drawImage(imgScore, 561, 545, 195, 35, null);
@@ -428,10 +425,6 @@ public class GUI extends JPanel implements KeyListener {
 
     public void keyPressed(KeyEvent e) {
 
-        Image dgUp = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Characters/DougUp.png"))).getImage();
-        Image dgSide = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Characters/DougSide.png"))).getImage();
-        Image dgDown = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Characters/DougDown.png"))).getImage();
-
         player.setVelX(0);
         player.setVelY(0);
 
@@ -439,7 +432,7 @@ public class GUI extends JPanel implements KeyListener {
 
         if (k == KeyEvent.VK_SPACE) {
 
-            if (idk.equals("UP") || idk.equals("DOWN")) {
+            if (player.getDirection().equals("Up") || player.getDirection().equals("Down")) {
                 weapon = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Characters/weaponUP.png"))).getImage();
             }
             else weapon = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Characters/weaponSide.png"))).getImage();
@@ -449,40 +442,32 @@ public class GUI extends JPanel implements KeyListener {
 
         if (!gunOut) {
 
-            if (k == KeyEvent.VK_LEFT || k == KeyEvent.VK_RIGHT) {
-
-                imgDigDug = dgSide;
-
-                if (k == KeyEvent.VK_LEFT) {
-
-                    idk = "LEFT";
-                    player.setVelX(-player.getVelocity());
-                    flip = -1;
-                    add = 40;
-                }
-                else {
-                    idk = "RIGHT";
-                    player.setVelX(player.getVelocity());
-                    flip = 1;
-                    add = 0;
-                }
+            if (k == KeyEvent.VK_LEFT) {
+                player.setDirection("Left");
+                player.setVelX(-player.getVelocity());
+            }
+            else if (k == KeyEvent.VK_RIGHT){
+                player.setDirection("Right");
+                player.setVelX(player.getVelocity());
             }
             else if (player.getVelX() == 0) {
 
                 if (k == KeyEvent.VK_UP) {
-
-                    idk = "UP";
+                    player.setDirection("Up");
                     player.setVelY(-player.getVelocity());
-                    imgDigDug = dgUp;
                 }
 
                 if (k == KeyEvent.VK_DOWN) {
-
-                    idk = "DOWN";
+                    player.setDirection("Down");
                     player.setVelY(player.getVelocity());
-                    imgDigDug = dgDown;
                 }
             }
+            String temp = player.getDirection();
+
+            if (temp.equals("Left") || temp.equals("Right")) {
+                temp = "Side";
+            }
+            imgDigDug = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Characters/Doug" + temp + ".png"))).getImage();
         }
 
         if (k == KeyEvent.VK_ESCAPE) {
@@ -539,8 +524,8 @@ public class GUI extends JPanel implements KeyListener {
         return player;
     }
 
-    public void setIdk2(String idk2) {
-        this.idk2 = idk2;
+    public void setGameEndScreen(String gameEndScreen) {
+        this.gameEndScreen = gameEndScreen;
     }
 
     public boolean isPausePlay() {
