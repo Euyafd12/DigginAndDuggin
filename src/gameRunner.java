@@ -10,6 +10,7 @@ public class gameRunner {
 
         while (true) {
 
+            //Needs Thread Sync/Locking
             System.out.print("");
             if (gui.getPlayer().getLives() < 1 || (gui.getPlayer().getKillCNT() == gui.getEnemyList().size())) {
 

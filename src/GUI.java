@@ -174,38 +174,14 @@ public class GUI extends JPanel implements KeyListener {
 
             prepGUI();
 
-            int pX = player.getX();
-            int pY = player.getY();
-
-            Rectangle rec = new Rectangle(pX, pY, 40, 40);
-
-            boolean check = true;
-
-            for (Rectangle rc : scoreList) {
-
-                if (rc.intersects(rec)) {
-                    check = false;
-                }
-            }
-
-            if (check) {
-                score += 5;
-                scoreList.add(rec);
-            }
-
-            if (score > highScore) {
-                highScore = score;
-            }
-
             drawScore();
-
-            g2d.fillRect(pX, pY, 40, 40);
 
             drawPath();
 
             drawFruit();
 
             drawWeapon();
+
             drawDigDug();
 
             drawEnemy();
@@ -218,6 +194,7 @@ public class GUI extends JPanel implements KeyListener {
 
     public void drawDigDug() {
 
+        g2d.fillRect(player.getX(), player.getY(), 40, 40);
         g2d.drawImage(imgDigDug, player.getX() + player.getAdd(), player.getY(), 40 * player.getFlip(), 40, null);
         player.path.add(new Point(player.getX(), player.getY()));
     }
@@ -272,7 +249,7 @@ public class GUI extends JPanel implements KeyListener {
 
         for (Fruit f : fruitList) {
 
-            if (!f.isEaten()) {
+            if (f.Appears()) {
 
                 switch (f.getType()) {
 
@@ -297,6 +274,28 @@ public class GUI extends JPanel implements KeyListener {
 
     public void drawScore() {
 
+        Rectangle rec = new Rectangle(player.getX(), player.getY(), 40, 40);
+
+        boolean check = true;
+
+        for (Rectangle rc : scoreList) {
+
+            if (rc.intersects(rec)) {
+                check = false;
+            }
+        }
+
+        if (check) {
+            score += 5;
+            scoreList.add(rec);
+        }
+
+        if (score > highScore) {
+            highScore = score;
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
         String sc = "" + score;
         String hc = "" + highScore;
 
@@ -318,6 +317,8 @@ public class GUI extends JPanel implements KeyListener {
                 xTemp += 24;
             }
         }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         else {
 
@@ -389,7 +390,8 @@ public class GUI extends JPanel implements KeyListener {
         }
 
         for (Fruit f : fruitList) {
-            if (!f.isEaten() && f.getBounds().intersects(plyr)) {
+
+            if (f.getBounds().intersects(plyr) && f.Appears()) {
                 f.eat();
                 score += 300;
             }
@@ -442,22 +444,22 @@ public class GUI extends JPanel implements KeyListener {
 
         if (!gunOut) {
 
-            if (k == KeyEvent.VK_LEFT) {
+            if (k == KeyEvent.VK_LEFT || k == KeyEvent.VK_A) {
                 player.setDirection("Left");
                 player.setVelX(-player.getVelocity());
             }
-            else if (k == KeyEvent.VK_RIGHT){
+            else if (k == KeyEvent.VK_RIGHT || k == KeyEvent.VK_D){
                 player.setDirection("Right");
                 player.setVelX(player.getVelocity());
             }
             else if (player.getVelX() == 0) {
 
-                if (k == KeyEvent.VK_UP) {
+                if (k == KeyEvent.VK_UP || k == KeyEvent.VK_W) {
                     player.setDirection("Up");
                     player.setVelY(-player.getVelocity());
                 }
 
-                if (k == KeyEvent.VK_DOWN) {
+                if (k == KeyEvent.VK_DOWN || k == KeyEvent.VK_S) {
                     player.setDirection("Down");
                     player.setVelY(player.getVelocity());
                 }
@@ -494,8 +496,8 @@ public class GUI extends JPanel implements KeyListener {
 
         switch (e.getKeyCode()) {
 
-            case KeyEvent.VK_UP, KeyEvent.VK_DOWN -> player.setVelY(0);
-            case KeyEvent.VK_RIGHT, KeyEvent.VK_LEFT -> player.setVelX(0);
+            case KeyEvent.VK_UP, KeyEvent.VK_DOWN, KeyEvent.VK_W, KeyEvent.VK_S -> player.setVelY(0);
+            case KeyEvent.VK_RIGHT, KeyEvent.VK_LEFT, KeyEvent.VK_A, KeyEvent.VK_D -> player.setVelX(0);
             case KeyEvent.VK_SPACE -> {
                 weapon = new ImageIcon(Objects.requireNonNull(getClass().getResource("Assets/Empty.png"))).getImage();
                 gunOut = false;

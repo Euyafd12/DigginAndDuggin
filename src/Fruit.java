@@ -1,6 +1,6 @@
 import java.awt.*;
 public class Fruit {
-    private boolean eaten;
+    private boolean appear;
     private int appearCNT;
     private final Rectangle edge;
     private String type;
@@ -8,7 +8,7 @@ public class Fruit {
     public Fruit() {
 
         type = "";
-        eaten = false;
+        appear = true;
         appearCNT = 0;
         edge = new Rectangle(0, 0, 0, 0);
     }
@@ -17,8 +17,8 @@ public class Fruit {
         return type;
     }
 
-    public boolean isEaten() {
-        return eaten;
+    public boolean Appears() {
+        return appear;
     }
 
     public int getAppearCNT() {
@@ -34,7 +34,7 @@ public class Fruit {
     }
 
     public void eat() {
-        eaten = true;
+        appear = false;
     }
 
     public void setType(String type) {

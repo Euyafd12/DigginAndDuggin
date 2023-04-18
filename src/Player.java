@@ -6,7 +6,6 @@ public class Player {
     private String direction;
     private final int velocity;
     public ArrayList<Point> path;
-
     public Player() {
 
         lives = 3;
