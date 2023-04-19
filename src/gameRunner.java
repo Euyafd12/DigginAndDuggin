@@ -7,6 +7,7 @@ public class gameRunner {
 
         framerateThread frameThread = new framerateThread(gui);
         frameThread.start();
+        //test
 
         while (true) {
 
